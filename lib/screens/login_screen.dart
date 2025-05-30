@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
@@ -18,6 +19,12 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _error;
   bool _passwordVisible = false;
 
+  Future<void> _saveSession(String email, String fullName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', email);
+    await prefs.setString('full_name', fullName);
+  }
+
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
@@ -33,14 +40,15 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = false;
     });
 
-    if (result['success'] == true && result['user'] != null) {
+    if (result['success']) {
+      await _saveSession(result['user']['email'], result['user']['full_name']);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder:
               (_) => HomeScreen(
-                userName: result['user']['full_name'] ?? '',
-                email: result['user']['email'] ?? '',
+                userName: result['user']['full_name'],
+                email: result['user']['email'],
               ),
         ),
       );
