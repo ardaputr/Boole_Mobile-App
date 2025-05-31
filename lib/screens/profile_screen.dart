@@ -84,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       }
 
-      final url = Uri.parse('http://localhost:5000/user/$userId');
+      final url = Uri.parse('http://172.16.71.164:5000/user/$userId');
 
       final response = await http.delete(url);
 

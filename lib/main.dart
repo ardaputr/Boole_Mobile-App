@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:device_preview/device_preview.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  runApp(
-    DevicePreview(
-      enabled: true, // Set false kalau mau matikan preview
-      builder: (context) => const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -52,10 +46,6 @@ class _MyAppState extends State<MyApp> {
     }
 
     return MaterialApp(
-      useInheritedMediaQuery:
-          true, // penting untuk Device Preview agar responsive
-      locale: DevicePreview.locale(context), // agar locale ikut preview
-      builder: DevicePreview.appBuilder, // wrap app dengan Device Preview
       title: 'Boole',
       theme: ThemeData(primarySwatch: Colors.teal),
       home:

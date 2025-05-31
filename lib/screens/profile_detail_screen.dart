@@ -31,7 +31,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
 
     try {
       // Ganti alamat IP sesuai backend kamu
-      final url = Uri.parse('http://localhost:5000/user/${widget.userId}');
+      final url = Uri.parse('http://172.16.71.164:5000/user/${widget.userId}');
 
       final response = await http.get(url);
 

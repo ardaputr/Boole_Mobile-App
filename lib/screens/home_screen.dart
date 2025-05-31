@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'profile_screen.dart';
-import 'weather_screen.dart';
+import 'profile_screen.dart'; // Pastikan sudah ada file ini
+import 'explore_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -22,18 +22,15 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     _pages = <Widget>[
-      const Center(child: Text('Explore Page')),
+      const ExploreScreen(),
       const Center(child: Text('Search Page')),
       const Center(child: Text('Menu Page')),
-      WeatherScreen(kodeWilayah: '31.71.01.1001'),
       ProfileScreen(userName: widget.userName, email: widget.email),
     ];
   }
 
   PreferredSizeWidget? getAppBar() {
-    // Jika halaman bukan index 0,1, atau 2, langsung return null (tidak ada AppBar)
     if (![0, 1, 2].contains(_currentIndex)) return null;
-    // Kalau index 0,1,2 tampilkan AppBar seperti biasa
     return PreferredSize(
       preferredSize: const Size.fromHeight(kToolbarHeight + 80),
       child: ClipRRect(
@@ -58,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 14, color: Colors.white70),
               ),
               const SizedBox(height: 16),
-              // Search Bar
               Container(
                 height: 40,
                 decoration: BoxDecoration(
@@ -67,10 +63,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
-                  children: [
-                    const Icon(Icons.search, color: Colors.grey),
-                    const SizedBox(width: 8),
-                    const Expanded(
+                  children: const [
+                    Icon(Icons.search, color: Colors.grey),
+                    SizedBox(width: 8),
+                    Expanded(
                       child: TextField(
                         decoration: InputDecoration(
                           hintText: 'What are you looking for?',
@@ -80,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    const Icon(Icons.info_outline, color: Colors.grey),
+                    Icon(Icons.info_outline, color: Colors.grey),
                   ],
                 ),
               ),
@@ -95,9 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: getAppBar(),
-
       body: _pages[_currentIndex],
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         selectedItemColor: Colors.cyan,
@@ -111,7 +105,6 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
-          BottomNavigationBarItem(icon: Icon(Icons.cloud), label: 'Weather'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
