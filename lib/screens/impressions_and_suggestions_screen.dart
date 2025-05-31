@@ -150,14 +150,14 @@ class ImpressionsAndSuggestionsScreen extends StatelessWidget {
               impressionOrSuggestionCard(
                 icon: Icons.thumb_up_alt_outlined,
                 iconColor: Colors.green.shade700,
-                title: 'Kesan',
+                title: 'Impression',
                 content:
                     'Mata kuliah Teknologi Pemrograman Mobile sangat membantu dalam memahami dasar-dasar pengembangan aplikasi mobile. Materi yang disampaikan mudah dipahami dan aplikatif.',
               ),
               impressionOrSuggestionCard(
                 icon: Icons.lightbulb_outline,
                 iconColor: Colors.orange.shade700,
-                title: 'Pesan',
+                title: 'Suggestion',
                 content:
                     'Semoga materi selanjutnya dapat lebih banyak membahas framework Flutter dan praktik langsung membuat aplikasi yang lebih kompleks. Selain itu, harap ada lebih banyak studi kasus yang relevan dengan kebutuhan industri saat ini.',
               ),

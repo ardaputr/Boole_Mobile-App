@@ -1,6 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../services/api_service.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
 
@@ -19,8 +20,9 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _error;
   bool _passwordVisible = false;
 
-  Future<void> _saveSession(String email, String fullName) async {
+  Future<void> _saveSession(int id, String email, String fullName) async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('user_id', id);
     await prefs.setString('email', email);
     await prefs.setString('full_name', fullName);
   }
@@ -31,30 +33,45 @@ class _LoginScreenState extends State<LoginScreen> {
       _error = null;
     });
 
-    final result = await ApiService.login(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (result['success']) {
-      await _saveSession(result['user']['email'], result['user']['full_name']);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder:
-              (_) => HomeScreen(
-                userName: result['user']['full_name'],
-                email: result['user']['email'],
-              ),
-        ),
+    final url = "http://localhost:5000/login";
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": _emailController.text.trim(),
+          "password": _passwordController.text,
+        }),
       );
-    } else {
+
+      final data = jsonDecode(response.body);
+      print("Response: $data");
+
+      if (data['success'] == true) {
+        final user = data['user'];
+        await _saveSession(user['id'], user['email'], user['full_name']);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder:
+                (_) => HomeScreen(
+                  userName: user['full_name'],
+                  email: user['email'],
+                ),
+          ),
+        );
+      } else {
+        setState(() {
+          _error = data['message'] ?? 'Login failed';
+        });
+      }
+    } catch (e) {
       setState(() {
-        _error = result['message'] ?? 'Login gagal';
+        _error = "An error occurred: $e";
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -96,6 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 20),
             const Text(
               'Hi, Welcome Back!',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),

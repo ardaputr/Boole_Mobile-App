@@ -4,9 +4,9 @@ import 'edit_profile_screen.dart';
 import 'package:http/http.dart' as http;
 
 class ProfileDetailScreen extends StatefulWidget {
-  final String email;
+  final int userId;
 
-  const ProfileDetailScreen({super.key, required this.email});
+  const ProfileDetailScreen({super.key, required this.userId});
 
   @override
   State<ProfileDetailScreen> createState() => _ProfileDetailScreenState();
@@ -30,12 +30,10 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.100.199/api/get_user_detail.php');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': widget.email}),
-      );
+      // Ganti alamat IP sesuai backend kamu
+      final url = Uri.parse('http://localhost:5000/user/${widget.userId}');
+
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -46,7 +44,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
           });
         } else {
           setState(() {
-            _error = data['message'] ?? 'Gagal memuat data user';
+            _error = data['message'] ?? 'Failed to load user data';
             _isLoading = false;
           });
         }
@@ -58,7 +56,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       }
     } catch (e) {
       setState(() {
-        _error = 'Koneksi gagal: $e';
+        _error = 'Connection failed: $e';
         _isLoading = false;
       });
     }
@@ -68,7 +66,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_error != null) return Center(child: Text(_error!));
     if (_userData == null)
-      return const Center(child: Text('Tidak ada data user'));
+      return const Center(child: Text('No user data found'));
 
     return Padding(
       padding: const EdgeInsets.all(16),

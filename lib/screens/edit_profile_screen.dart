@@ -17,7 +17,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late String _selectedGender;
   late TextEditingController _countryController;
   late TextEditingController _phoneController;
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController; // Tambah controller password
 
+  bool _passwordVisible = false; // Untuk toggle visibility password
   bool _isLoading = false;
   String? _error;
 
@@ -32,6 +35,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _selectedGender = user['gender'] ?? 'O';
     _countryController = TextEditingController(text: user['country'] ?? '');
     _phoneController = TextEditingController(text: user['phone_number'] ?? '');
+    _emailController = TextEditingController(text: user['email'] ?? '');
+    _passwordController = TextEditingController();
   }
 
   @override
@@ -40,6 +45,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _birthDateController.dispose();
     _countryController.dispose();
     _phoneController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -63,27 +70,37 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.100.199/api/update_user.php');
-      final response = await http.post(
+      final int userId = widget.userData['id'];
+
+      final url = Uri.parse('http://localhost:5000/user/$userId');
+
+      // Bangun body, sertakan password hanya jika diisi
+      Map<String, dynamic> body = {
+        'full_name': _fullNameController.text.trim(),
+        'birth_date': _birthDateController.text.trim(),
+        'gender': _selectedGender,
+        'country': _countryController.text.trim(),
+        'phone_number': _phoneController.text.trim(),
+        'email': _emailController.text.trim(),
+      };
+
+      if (_passwordController.text.isNotEmpty) {
+        body['password'] = _passwordController.text.trim();
+      }
+
+      final response = await http.put(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': widget.userData['email'],
-          'full_name': _fullNameController.text.trim(),
-          'birth_date': _birthDateController.text.trim(),
-          'gender': _selectedGender,
-          'country': _countryController.text.trim(),
-          'phone_number': _phoneController.text.trim(),
-        }),
+        body: jsonEncode(body),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (data['success'] == true) {
+        if (data['message'] != null) {
           Navigator.pop(context, true);
         } else {
           setState(() {
-            _error = data['message'] ?? 'Update gagal';
+            _error = 'Update failed';
             _isLoading = false;
           });
         }
@@ -95,7 +112,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     } catch (e) {
       setState(() {
-        _error = 'Koneksi gagal: $e';
+        _error = 'Connection failed: $e';
         _isLoading = false;
       });
     }
@@ -107,6 +124,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     bool readOnly = false,
     VoidCallback? onTap,
     TextInputType? keyboardType,
+    bool obscureText = false,
+    Widget? suffixIcon,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,12 +144,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           readOnly: readOnly,
           onTap: onTap,
           keyboardType: keyboardType,
+          obscureText: obscureText,
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 12,
             ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            suffixIcon: suffixIcon,
           ),
         ),
       ],
@@ -149,6 +170,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _buildTextField(
               label: 'Full Name',
               controller: _fullNameController,
+            ),
+            const SizedBox(height: 20),
+            _buildTextField(
+              label: 'Email',
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+            ),
+            const SizedBox(height: 20),
+            _buildTextField(
+              label: 'Password (leave blank to keep current)',
+              controller: _passwordController,
+              obscureText: !_passwordVisible,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _passwordVisible ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _passwordVisible = !_passwordVisible;
+                  });
+                },
+              ),
             ),
             const SizedBox(height: 20),
             _buildTextField(
@@ -199,12 +242,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               controller: _phoneController,
               keyboardType: TextInputType.phone,
             ),
-
             const SizedBox(height: 30),
-
             if (_error != null)
               Text(_error!, style: const TextStyle(color: Colors.red)),
-
             if (_isLoading)
               const Center(child: CircularProgressIndicator())
             else

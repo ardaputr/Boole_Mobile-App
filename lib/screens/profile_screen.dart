@@ -7,11 +7,32 @@ import 'impressions_and_suggestions_screen.dart';
 import 'student_screen.dart';
 import 'login_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   final String userName;
   final String email;
 
   const ProfileScreen({super.key, required this.userName, required this.email});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  int? userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getInt('user_id');
+    setState(() {
+      userId = id;
+    });
+  }
 
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
@@ -48,47 +69,67 @@ class ProfileScreen extends StatelessWidget {
           ),
     );
 
-    if (confirm == true) {
-      final url = Uri.parse('http://192.168.100.199/api/delete_user.php');
-      try {
-        final response = await http.post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'email': email}),
+    if (confirm != true) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final int? userId = prefs.getInt('user_id');
+
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('User ID not found, please login again'),
+          ),
         );
+        return;
+      }
 
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          if (data['success'] == true) {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.clear(); // Hapus session setelah delete berhasil
+      final url = Uri.parse('http://localhost:5000/user/$userId');
 
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(data['message'])));
+      final response = await http.delete(url);
 
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-              (route) => false,
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(data['message'] ?? 'Failed to delete account'),
-              ),
-            );
-          }
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['message'] != null) {
+          await prefs.clear();
+
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(data['message'])));
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const LoginScreen()),
+            (route) => false,
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Server error: ${response.statusCode}')),
+            const SnackBar(content: Text('Failed to delete account')),
           );
         }
-      } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Connection error: $e')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Server error: ${response.statusCode}')),
+        );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Connection error: $e')));
+    }
+  }
+
+  void _openProfileDetail() {
+    if (userId != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ProfileDetailScreen(userId: userId!)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User ID not found, please login again')),
+      );
     }
   }
 
@@ -112,7 +153,7 @@ class ProfileScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    userName,
+                    widget.userName,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -121,27 +162,20 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(),
                   Text(
-                    email,
+                    widget.email,
                     style: const TextStyle(fontSize: 14, color: Colors.white70),
                   ),
                 ],
               ),
             ),
-
             const SizedBox(height: 24),
-
-            // Border container tetap
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.cyan.shade200),
                 borderRadius: BorderRadius.circular(20),
               ),
-
-              // Batasi tinggi konten agar scroll muncul di dalam border
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  // Sesuaikan tinggi maksimal sesuai kebutuhan,
-                  // misal setengah tinggi layar atau tertentu
                   maxHeight: MediaQuery.of(context).size.height * 0.6,
                 ),
                 child: SingleChildScrollView(
@@ -153,14 +187,7 @@ class ProfileScreen extends StatelessWidget {
                         iconBgColor: Colors.cyan.shade100,
                         title: 'Details',
                         subtitle: 'Complete details of your account',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ProfileDetailScreen(email: email),
-                            ),
-                          );
-                        },
+                        onTap: _openProfileDetail,
                       ),
                       _buildMenuItem(
                         context,
@@ -172,7 +199,6 @@ class ProfileScreen extends StatelessWidget {
                           // TODO: implement Wishlist navigation
                         },
                       ),
-                      // Contoh panggilan dari menu Student
                       _buildMenuItem(
                         context,
                         icon: Icons.school_outlined,

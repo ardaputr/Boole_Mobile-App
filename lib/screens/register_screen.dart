@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+// import '../services/api_service.dart';
 import '../widgets/custom_text_field.dart';
-import 'login_screen.dart'; // pastikan import ini agar bisa navigasi ke LoginScreen
+import 'login_screen.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -43,21 +46,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _register() async {
-    if (_selectedGender == null) {
+    if (_fullNameController.text.isEmpty ||
+        _birthDateController.text.isEmpty ||
+        _selectedGender == null ||
+        _countryController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
       setState(() {
-        _error = 'Please select gender';
-      });
-      return;
-    }
-    if (_birthDateController.text.isEmpty) {
-      setState(() {
-        _error = 'Please select birth date';
-      });
-      return;
-    }
-    if (_countryController.text.trim().isEmpty) {
-      setState(() {
-        _error = 'Please enter country';
+        _error = 'Please fill all required fields';
       });
       return;
     }
@@ -67,28 +63,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _error = null;
     });
 
-    final result = await ApiService.register(
-      fullName: _fullNameController.text.trim(),
-      birthDate: _birthDateController.text.trim(),
-      gender: _selectedGender ?? '',
-      country: _countryController.text.trim(),
-      email: _emailController.text.trim(),
-      phoneNumber: _phoneController.text.trim(),
-      password: _passwordController.text,
-    );
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (result['success']) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registrasi berhasil! Silakan login.')),
+    try {
+      String url = "http://localhost:5000/register";
+      var res = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "full_name": _fullNameController.text.trim(),
+          "birth_date": _birthDateController.text.trim(),
+          "gender": _selectedGender,
+          "country": _countryController.text.trim(),
+          "email": _emailController.text.trim(),
+          "phone_number": _phoneController.text.trim(),
+          "password": _passwordController.text,
+        }),
       );
-      Navigator.pop(context);
-    } else {
+
+      var response = jsonDecode(res.body);
+
+      if (response["success"] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Registration Successful")),
+        );
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      } else if (response["message"] == "Email Already Exists") {
+        setState(() {
+          _error = "Email Already Exists";
+        });
+      } else {
+        setState(() {
+          _error = response["message"] ?? "Registration Failed";
+        });
+      }
+    } catch (e) {
       setState(() {
-        _error = result['message'] ?? 'Registrasi gagal';
+        _error = "An error occurred. Please try again.";
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -123,10 +138,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  Widget _buildLabel(String text) {
-    return Text(text, style: const TextStyle(fontWeight: FontWeight.w500));
   }
 
   @override
