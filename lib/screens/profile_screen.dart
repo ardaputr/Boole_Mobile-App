@@ -37,7 +37,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    // await prefs.clear(); // Hapus semua session lokal
+    await prefs.remove('user_id');
+    await prefs.remove('email');
+    await prefs.remove('full_name');
+    // Jangan gunakan prefs.clear() agar wishlist tidak hilang
+
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -85,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       }
       //url
-      final url = Uri.parse('http://192.168.67.52:5000/user/$userId');
+      final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
 
       final response = await http.delete(url);
 

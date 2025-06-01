@@ -68,25 +68,44 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
   String? translatedDescription;
   late String displayedDescription;
 
+  int? userId;
+
+  @override
   @override
   void initState() {
     super.initState();
     place = widget.place;
     displayedDescription = place.description;
-    _loadFavoriteStatus();
+    _loadUserIdAndFavoriteStatus();
   }
 
-  Future<void> _loadFavoriteStatus() async {
+  Future<void> _loadUserIdAndFavoriteStatus() async {
     final prefs = await SharedPreferences.getInstance();
-    final favList = prefs.getStringList('wishlist') ?? [];
+    userId = prefs.getInt('user_id');
+
+    if (userId == null) {
+      setState(() {
+        place.isFavorite = false;
+      });
+      return;
+    }
+
+    final favList = prefs.getStringList('wishlist_user_$userId') ?? [];
     setState(() {
       place.isFavorite = favList.contains(place.id.toString());
     });
   }
 
   Future<void> _toggleFavorite() async {
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User ID not found. Please login again.')),
+      );
+      return;
+    }
     final prefs = await SharedPreferences.getInstance();
-    final favList = prefs.getStringList('wishlist') ?? [];
+    final key = 'wishlist_user_$userId';
+    final favList = prefs.getStringList(key) ?? [];
 
     setState(() {
       if (place.isFavorite) {
@@ -98,7 +117,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
       }
     });
 
-    await prefs.setStringList('wishlist', favList);
+    await prefs.setStringList(key, favList);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

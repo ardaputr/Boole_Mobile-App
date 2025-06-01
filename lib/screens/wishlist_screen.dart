@@ -23,7 +23,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   Future<void> _loadWishlist() async {
     final prefs = await SharedPreferences.getInstance();
-    final currentUserId = prefs.getString('currentUserId');
+    final currentUserId = prefs.getInt(
+      'user_id',
+    ); // ambil user_id dari SharedPreferences
     if (currentUserId == null) {
       setState(() {
         wishlistPlaces = [];
@@ -49,7 +51,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   Future<List<Place>> fetchAllPlaces() async {
     final response = await http.get(
-      Uri.parse('http://192.168.67.52:5000/places'),
+      Uri.parse('http://192.168.100.199:5000/places'),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
