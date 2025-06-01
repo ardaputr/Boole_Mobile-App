@@ -94,14 +94,20 @@ class ImpressionsAndSuggestionsScreen extends StatelessWidget {
               ),
               Center(
                 child: Text(
-                  'NIP: 19890801 201903 1 013 NIDN: 0001088905',
+                  'NIP: 19890801 201903 1 013',
+                  style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+                ),
+              ),
+              Center(
+                child: Text(
+                  'NIDN: 0001088905',
                   style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
                 ),
               ),
               const SizedBox(height: 20),
               // Pendidikan
               const Text(
-                'PENDIDIKAN',
+                'Education',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -118,7 +124,7 @@ class ImpressionsAndSuggestionsScreen extends StatelessWidget {
               const SizedBox(height: 10),
               // Bidang Kemintan
               const Text(
-                'BIDANG KEMINATAN',
+                'Field of Interest',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -133,7 +139,7 @@ class ImpressionsAndSuggestionsScreen extends StatelessWidget {
               const SizedBox(height: 10),
               // Kontak
               const Text(
-                'KONTAK',
+                'Contact',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

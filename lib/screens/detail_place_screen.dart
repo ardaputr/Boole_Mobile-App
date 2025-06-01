@@ -327,7 +327,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                               place.name,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 28,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 shadows: [
                                   Shadow(
@@ -338,22 +338,22 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 2),
                             Row(
                               children: [
                                 const Icon(
                                   Icons.location_on,
                                   color: Colors.white70,
-                                  size: 18,
+                                  size: 16,
                                 ),
-                                const SizedBox(width: 6),
+                                const SizedBox(width: 3),
                                 Flexible(
                                   child: Text(
                                     place.category[0].toUpperCase() +
                                         place.category.substring(1),
                                     style: const TextStyle(
                                       color: Colors.white70,
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       shadows: [
                                         Shadow(
                                           color: Colors.black45,
