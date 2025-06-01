@@ -71,7 +71,6 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
   int? userId;
 
   @override
-  @override
   void initState() {
     super.initState();
     place = widget.place;

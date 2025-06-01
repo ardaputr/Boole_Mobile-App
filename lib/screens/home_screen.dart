@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'profile_screen.dart'; // Pastikan sudah ada file ini
+import 'profile_screen.dart';
 import 'explore_screen.dart';
-import 'search_screen.dart'; // Import SearchScreen
+import 'search_screen.dart';
+import 'compass_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -24,14 +25,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _pages = <Widget>[
       const ExploreScreen(),
-      SearchScreen(),
-      const Center(child: Text('Menu Page')),
+      const SearchScreen(),
+      const CompassScreen(),
       ProfileScreen(userName: widget.userName, email: widget.email),
     ];
   }
 
   PreferredSizeWidget? getAppBar() {
-    if (![0].contains(_currentIndex)) return null;
+    if (_currentIndex != 0) return null;
+
     return PreferredSize(
       preferredSize: const Size.fromHeight(kToolbarHeight + 80),
       child: ClipRRect(
@@ -63,8 +65,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.search, color: Colors.grey),
                     SizedBox(width: 8),
                     Expanded(
@@ -91,23 +93,57 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody:
+          true, // penting untuk membuat background terlihat di bawah BottomNavigationBar
       appBar: getAppBar(),
       body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors.cyan,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.3), // transparansi 30%
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+          child: BottomNavigationBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            currentIndex: _currentIndex,
+            selectedItemColor: Colors.cyan,
+            unselectedItemColor: Colors.grey,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.explore),
+                label: 'Explore',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.search),
+                label: 'Search',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.navigation),
+                label: 'Compass',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

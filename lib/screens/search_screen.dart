@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/place.dart';
-import 'detail_place_screen.dart'; // Import halaman detail
+import 'detail_place_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
