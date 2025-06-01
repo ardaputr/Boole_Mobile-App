@@ -412,7 +412,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                       child: Column(
                         children: [
                           const Text(
-                            'Buka',
+                            'Opening Hours',
                             style: TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                           const SizedBox(height: 8),
@@ -465,7 +465,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                       child: Column(
                         children: [
                           const Text(
-                            'Harga tiket',
+                            'Price',
                             style: TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                           const SizedBox(height: 8),

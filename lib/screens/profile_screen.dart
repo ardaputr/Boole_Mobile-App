@@ -37,7 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Hapus semua session lokal
+    // await prefs.clear(); // Hapus semua session lokal
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const LoginScreen()),
