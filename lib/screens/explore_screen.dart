@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/place.dart';
-import 'detail_place_screen.dart'; // Sesuaikan path jika berbeda
+import 'detail_place_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -22,7 +22,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   Future<List<Place>> fetchPlaces() async {
     final response = await http.get(
-      Uri.parse('http://192.168.100.199:5000/places'),
+      //url
+      Uri.parse('http://192.168.67.52:5000/places'),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

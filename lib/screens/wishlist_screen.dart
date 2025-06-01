@@ -41,7 +41,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   Future<List<Place>> fetchAllPlaces() async {
     final response = await http.get(
-      Uri.parse('http://192.168.100.199:5000/places'),
+      //url
+      Uri.parse('http://192.168.1.231:5000/places'),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

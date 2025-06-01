@@ -32,8 +32,8 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
       _error = null;
     });
-
-    final url = "http://192.168.100.199:5000/login";
+    //url
+    final url = "http://192.168.67.52:5000/login";
     try {
       final response = await http.post(
         Uri.parse(url),

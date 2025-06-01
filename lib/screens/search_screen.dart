@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/place.dart';
-import './detail_place_screen.dart'; // Import halaman detail
+import 'detail_place_screen.dart'; // Import halaman detail
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -32,7 +32,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<List<Place>> fetchPlaces() async {
     final response = await http.get(
-      Uri.parse('http://192.168.100.199:5000/places'),
+      Uri.parse('http://192.168.67.52:5000/places'),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -111,6 +111,20 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  // Fungsi konversi waktu HH:mm:ss ke HH:mm
+  String formatTimeToHHmm(String time) {
+    try {
+      final parts = time.split(':');
+      if (parts.length >= 2) {
+        return '${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}';
+      } else {
+        return time;
+      }
+    } catch (_) {
+      return time;
+    }
+  }
+
   Widget buildPlaceCard(Place place) {
     return Container(
       width: 180,
@@ -126,7 +140,6 @@ class _SearchScreenState extends State<SearchScreen> {
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           onTap: () {
-            // Navigasi ke halaman detail
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -195,8 +208,6 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-
-                    // Tampilkan label Buka dan harga tiket di atas datanya
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -204,7 +215,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              "Buka",
+                              "Opening Hours",
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -212,7 +223,9 @@ class _SearchScreenState extends State<SearchScreen> {
                               ),
                             ),
                             Text(
-                              place.openingHours ?? "-",
+                              place.openingHours != null
+                                  ? formatTimeToHHmm(place.openingHours!)
+                                  : "-",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -226,7 +239,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              "Harga tiket",
+                              "Price",
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -301,7 +314,6 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Search Bar
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Container(
@@ -328,11 +340,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                 ),
-
-                // Category Filters
                 buildCategoryFilters(),
-
-                // Jika kategori all, tampilkan semua kategori satu per satu
                 Expanded(
                   child:
                       _selectedCategory == 'all'
@@ -344,8 +352,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               const SizedBox(height: 20),
                             ],
                           )
-                          : // Jika bukan all, tampilkan kategori yang dipilih saja
-                          ListView(
+                          : ListView(
                             children: [
                               buildCategorySection(
                                 _selectedCategory,
