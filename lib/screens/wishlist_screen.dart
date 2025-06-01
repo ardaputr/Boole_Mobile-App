@@ -72,11 +72,22 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    title: Text(place.name),
-                    subtitle: Text(
-                      place.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    title: Text(
+                      place.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Row(
+                      children: [
+                        const Icon(Icons.star, color: Colors.amber, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          place.rating.toStringAsFixed(1),
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.arrow_forward_ios),
