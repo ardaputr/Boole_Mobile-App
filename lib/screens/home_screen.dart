@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'profile_screen.dart'; // Pastikan sudah ada file ini
 import 'explore_screen.dart';
+import 'search_screen.dart'; // Import SearchScreen
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -23,14 +24,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _pages = <Widget>[
       const ExploreScreen(),
-      const Center(child: Text('Search Page')),
+      SearchScreen(),
       const Center(child: Text('Menu Page')),
       ProfileScreen(userName: widget.userName, email: widget.email),
     ];
   }
 
   PreferredSizeWidget? getAppBar() {
-    if (![0, 1, 2].contains(_currentIndex)) return null;
+    if (![0].contains(_currentIndex)) return null;
     return PreferredSize(
       preferredSize: const Size.fromHeight(kToolbarHeight + 80),
       child: ClipRRect(

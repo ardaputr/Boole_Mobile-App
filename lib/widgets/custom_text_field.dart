@@ -7,6 +7,9 @@ class CustomTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final bool readOnly;
   final VoidCallback? onTap;
+  final int maxLines;
+  final Widget? suffixIcon;
+  final String? Function(String?)? validator;
 
   const CustomTextField({
     super.key,
@@ -16,20 +19,26 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.readOnly = false,
     this.onTap,
+    this.maxLines = 1,
+    this.suffixIcon,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: controller,
+      maxLines: maxLines,
       decoration: InputDecoration(
         labelText: labelText,
         border: const OutlineInputBorder(),
+        suffixIcon: suffixIcon,
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,
       readOnly: readOnly,
       onTap: onTap,
+      validator: validator,
     );
   }
 }

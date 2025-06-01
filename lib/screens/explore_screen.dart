@@ -21,7 +21,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   Future<List<Place>> fetchPlaces() async {
     final response = await http.get(
-      Uri.parse('http://172.16.71.164:5000/places'),
+      Uri.parse('http://192.168.100.199:5000/places'),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -54,7 +54,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
             children: [
               Container(color: Colors.cyan.shade100),
 
-              // DraggableScrollableSheet dengan scroll controller dari builder
+              // DraggableScrollableSheet dengan rekomendasi
               DraggableScrollableSheet(
                 initialChildSize: 0.6,
                 minChildSize: 0.3,
@@ -106,7 +106,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               ),
                               const SizedBox(height: 12),
                               SizedBox(
-                                height: 200,
+                                height: 210,
                                 child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   padding: const EdgeInsets.symmetric(
@@ -142,20 +142,68 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Image.network(
-                                                place.photoUrl,
-                                                height: 130,
-                                                width: double.infinity,
-                                                fit: BoxFit.cover,
-                                                errorBuilder:
-                                                    (
-                                                      context,
-                                                      error,
-                                                      stackTrace,
-                                                    ) => const Icon(
-                                                      Icons.broken_image,
-                                                      size: 130,
+                                              Stack(
+                                                children: [
+                                                  Image.network(
+                                                    place.photoUrl,
+                                                    height: 130,
+                                                    width: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) => const Icon(
+                                                          Icons.broken_image,
+                                                          size: 130,
+                                                        ),
+                                                  ),
+                                                  // Rating badge
+                                                  Positioned(
+                                                    right: 8,
+                                                    bottom: 8,
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 4,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white70,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              12,
+                                                            ),
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          const Icon(
+                                                            Icons.star,
+                                                            size: 14,
+                                                            color: Colors.amber,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 4,
+                                                          ),
+                                                          Text(
+                                                            place.rating
+                                                                .toStringAsFixed(
+                                                                  1,
+                                                                ),
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 12,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
+                                                  ),
+                                                ],
                                               ),
                                               Padding(
                                                 padding: const EdgeInsets.all(
@@ -198,7 +246,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              // Tambah section lain di sini jika ingin
                             ],
                           ),
                         ),
