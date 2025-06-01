@@ -6,8 +6,10 @@ class Place {
   final String category;
   final String urlMaps;
   final double rating;
-  final String? openingHours; // nullable String
-  final double? ticketPrice; // nullable double
+  final String? openingHours;
+  final double? ticketPrice;
+  final String? address;
+  bool isFavorite;
 
   Place({
     required this.id,
@@ -19,6 +21,8 @@ class Place {
     required this.rating,
     this.openingHours,
     this.ticketPrice,
+    this.address,
+    this.isFavorite = false,
   });
 
   factory Place.fromJson(Map<String, dynamic> json) {
@@ -38,6 +42,8 @@ class Place {
           json['ticket_price'] != null
               ? double.tryParse(json['ticket_price'].toString())
               : null,
+      address: json['address'],
+      isFavorite: false,
     );
   }
 }

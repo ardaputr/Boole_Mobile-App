@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/place.dart';
+import './detail_place_screen.dart'; // Import halaman detail
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -125,7 +126,13 @@ class _SearchScreenState extends State<SearchScreen> {
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           onTap: () {
-            // TODO: navigasi ke detail page jika perlu
+            // Navigasi ke halaman detail
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailPlaceScreen(place: place),
+              ),
+            );
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

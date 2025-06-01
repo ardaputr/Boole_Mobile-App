@@ -6,6 +6,7 @@ import 'profile_detail_screen.dart';
 import 'impressions_and_suggestions_screen.dart';
 import 'student_screen.dart';
 import 'login_screen.dart';
+import 'wishlist_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String userName;
@@ -84,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       }
 
-      final url = Uri.parse('http://172.16.71.164:5000/user/$userId');
+      final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
 
       final response = await http.delete(url);
 
@@ -196,7 +197,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: 'Wishlist',
                         subtitle: 'Places you want to visit',
                         onTap: () {
-                          // TODO: implement Wishlist navigation
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const WishlistScreen(),
+                            ),
+                          );
                         },
                       ),
                       _buildMenuItem(

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/place.dart';
+import 'detail_place_screen.dart'; // Sesuaikan path jika berbeda
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -53,8 +54,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
           body: Stack(
             children: [
               Container(color: Colors.cyan.shade100),
-
-              // DraggableScrollableSheet dengan rekomendasi
               DraggableScrollableSheet(
                 initialChildSize: 0.6,
                 minChildSize: 0.3,
@@ -136,7 +135,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         borderRadius: BorderRadius.circular(24),
                                         child: InkWell(
                                           onTap: () {
-                                            // TODO: Navigasi ke detail page jika mau
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (context) =>
+                                                        DetailPlaceScreen(
+                                                          place: place,
+                                                        ),
+                                              ),
+                                            );
                                           },
                                           child: Column(
                                             crossAxisAlignment:
@@ -159,7 +167,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                           size: 130,
                                                         ),
                                                   ),
-                                                  // Rating badge
                                                   Positioned(
                                                     right: 8,
                                                     bottom: 8,
