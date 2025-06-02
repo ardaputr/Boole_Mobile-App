@@ -5,6 +5,7 @@ import '../models/place.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:another_flushbar/flushbar.dart'; // Tambahkan import Flushbar
 
 class DetailPlaceScreen extends StatefulWidget {
   final Place place;
@@ -118,13 +119,20 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
 
     await prefs.setStringList(key, favList);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          place.isFavorite ? 'Added to Wishlist' : 'Removed from Wishlist',
-        ),
-      ),
-    );
+    // Tampilkan notifikasi Flushbar saat tambah/hapus wishlist
+    Flushbar(
+      message:
+          place.isFavorite
+              ? 'Place successfully added to wishlist'
+              : 'Place successfully removed from wishlist',
+      icon: const Icon(Icons.favorite, color: Colors.white),
+      duration: const Duration(seconds: 3),
+      flushbarPosition: FlushbarPosition.TOP,
+      margin: const EdgeInsets.all(8),
+      borderRadius: BorderRadius.circular(10),
+      backgroundColor: Colors.cyan,
+      animationDuration: const Duration(milliseconds: 500),
+    ).show(context);
   }
 
   void _launchURL(String url) async {

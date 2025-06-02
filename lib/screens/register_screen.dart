@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-// import '../services/api_service.dart';
 import '../widgets/custom_text_field.dart';
 import 'login_screen.dart';
 import 'package:http/http.dart' as http;
@@ -64,7 +63,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      //url
       String url = "http://172.16.81.177:5000/register";
       var res = await http.post(
         Uri.parse(url),
@@ -86,8 +84,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration Successful")),
         );
+
+        // Navigasi ke LoginScreen dengan flag untuk notifikasi
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          MaterialPageRoute(
+            builder:
+                (context) => const LoginScreen(showWelcomeNotification: true),
+          ),
         );
       } else if (response["message"] == "Email Already Exists") {
         setState(() {
@@ -157,13 +160,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
             const SizedBox(height: 32),
-
             CustomTextField(
               controller: _fullNameController,
               labelText: 'Enter Your Fullname',
             ),
             const SizedBox(height: 20),
-
             CustomTextField(
               controller: _birthDateController,
               labelText: 'Birth Date (YYYY-MM-DD)',
@@ -171,7 +172,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onTap: _selectBirthDate,
             ),
             const SizedBox(height: 20),
-
             DropdownButtonFormField<String>(
               value: _selectedGender,
               decoration: InputDecoration(
@@ -192,33 +192,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
               },
             ),
             const SizedBox(height: 20),
-
             CustomTextField(
               controller: _countryController,
               labelText: 'Enter Your Country',
             ),
             const SizedBox(height: 20),
-
             CustomTextField(
               controller: _emailController,
               labelText: 'Enter Your Email',
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 20),
-
             CustomTextField(
               controller: _phoneController,
               labelText: 'Enter Your Phone Number',
               keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 20),
-
             _buildPasswordField(),
             const SizedBox(height: 30),
-
             if (_error != null)
               Text(_error!, style: const TextStyle(color: Colors.red)),
-
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -239,7 +233,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
               ),
             ),
-
             const SizedBox(height: 40),
             Row(
               children: const [

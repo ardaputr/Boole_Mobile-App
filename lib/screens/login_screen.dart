@@ -2,11 +2,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:another_flushbar/flushbar.dart'; // Import Flushbar
+
 import 'home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final bool showWelcomeNotification;
+
+  const LoginScreen({super.key, this.showWelcomeNotification = false});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -20,6 +24,38 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _error;
   bool _passwordVisible = false;
 
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.showWelcomeNotification) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showWelcomeNotification();
+      });
+    }
+  }
+
+  void _showWelcomeNotification() {
+    Flushbar(
+      message: "Let's go to explore",
+      icon: const Icon(Icons.chat_bubble, size: 28.0, color: Colors.white),
+      duration: const Duration(seconds: 3),
+      flushbarPosition: FlushbarPosition.TOP,
+      margin: const EdgeInsets.all(8),
+      borderRadius: BorderRadius.circular(10),
+      backgroundColor: Colors.cyan,
+      animationDuration: const Duration(milliseconds: 500),
+      mainButton: TextButton(
+        onPressed: () {
+          Navigator.of(
+            context,
+          ).pop(); // Tutup notifikasi saat tombol OK ditekan
+        },
+        child: const Text('OK', style: TextStyle(color: Colors.white)),
+      ),
+    ).show(context);
+  }
+
   Future<void> _saveSession(int id, String email, String fullName) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('user_id', id);
@@ -32,8 +68,9 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
       _error = null;
     });
-    //url
+
     final url = "http://172.16.81.177:5000/login";
+
     try {
       final response = await http.post(
         Uri.parse(url),

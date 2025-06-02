@@ -18,9 +18,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _countryController;
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
-  late TextEditingController _passwordController; // Tambah controller password
+  late TextEditingController _passwordController;
 
-  bool _passwordVisible = false; // Untuk toggle visibility password
+  bool _passwordVisible = false;
   bool _isLoading = false;
   String? _error;
 
@@ -59,7 +59,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       lastDate: DateTime.now(),
     );
     if (pickedDate != null) {
-      _birthDateController.text = pickedDate.toIso8601String().substring(0, 10);
+      setState(() {
+        _birthDateController.text = pickedDate.toIso8601String().substring(
+          0,
+          10,
+        );
+      });
     }
   }
 
@@ -71,12 +76,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final int userId = widget.userData['id'];
-
-      // final url = Uri.parse('http://localhost:5000/user/$userId');
-      //url
       final url = Uri.parse('http://172.16.81.177:5000/user/$userId');
 
-      // Bangun body, sertakan password hanya jika diisi
       Map<String, dynamic> body = {
         'full_name': _fullNameController.text.trim(),
         'birth_date': _birthDateController.text.trim(),
