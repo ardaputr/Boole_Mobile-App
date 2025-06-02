@@ -35,52 +35,40 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_currentIndex != 0) return null;
 
     return PreferredSize(
-      preferredSize: const Size.fromHeight(kToolbarHeight + 80),
+      preferredSize: const Size.fromHeight(kToolbarHeight + 30),
       child: ClipRRect(
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
         child: Container(
           color: Colors.cyan,
-          padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.fromLTRB(20, 53, 20, 20),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                'Hi, ${widget.userName}!',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'You Are Now In Yogyakarta',
-                style: TextStyle(fontSize: 14, color: Colors.white70),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: const Row(
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.search, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'What are you looking for?',
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
-                        ),
+                    Text(
+                      'Hi, ${widget.userName}!',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.white,
                       ),
                     ),
-                    Icon(Icons.info_outline, color: Colors.grey),
+                    const Text(
+                      'Discovering Nearby Places',
+                      style: TextStyle(fontSize: 14, color: Colors.white70),
+                    ),
                   ],
+                ),
+              ),
+              Text(
+                _getGreetingMessage(),
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white70,
+                  fontStyle: FontStyle.italic,
                 ),
               ),
             ],
@@ -90,16 +78,26 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  String _getGreetingMessage() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good Morning';
+    } else if (hour < 17) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody:
-          true, // penting untuk membuat background terlihat di bawah BottomNavigationBar
+      extendBody: true,
       appBar: getAppBar(),
       body: _pages[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.3), // transparansi 30%
+          color: Colors.white.withOpacity(0.3),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),

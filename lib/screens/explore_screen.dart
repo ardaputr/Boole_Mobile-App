@@ -18,17 +18,28 @@ class _ExploreScreenState extends State<ExploreScreen> {
   late Future<List<Place>> _placesFuture;
   final Completer<GoogleMapController> _controller = Completer();
   LatLng? _currentPosition;
+  Set<Marker> _markers = {};
+
+  List<Place> _allPlaces = [];
+  List<Place> _filteredPlaces = [];
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     _placesFuture = fetchPlaces();
+    _placesFuture.then((places) {
+      setState(() {
+        _allPlaces = places;
+        _filteredPlaces = places;
+        _setMarkers(_filteredPlaces);
+      });
+    });
     _getCurrentLocation();
   }
 
   Future<void> _getCurrentLocation() async {
     try {
-      // Check location permission
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -37,7 +48,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
         }
       }
 
-      // Get current position
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
@@ -46,7 +56,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
         _currentPosition = LatLng(position.latitude, position.longitude);
       });
 
-      // Move camera to current location
       final GoogleMapController controller = await _controller.future;
       controller.animateCamera(
         CameraUpdate.newCameraPosition(
@@ -71,6 +80,83 @@ class _ExploreScreenState extends State<ExploreScreen> {
     }
   }
 
+  double calculateDistance(LatLng start, LatLng end) {
+    return Geolocator.distanceBetween(
+          start.latitude,
+          start.longitude,
+          end.latitude,
+          end.longitude,
+        ) /
+        // Convert meters to kilometers
+        200;
+  }
+
+  void _setMarkers(List<Place> places) {
+    final newMarkers =
+        places.where((p) => p.latitude != null && p.longitude != null).map((p) {
+          BitmapDescriptor icon;
+
+          switch (p.category.toLowerCase()) {
+            case 'beach':
+              icon = BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueAzure,
+              ); // biru muda
+              break;
+            case 'culinary':
+              icon = BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueOrange,
+              ); // oranye
+              break;
+            case 'nature':
+              icon = BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueGreen,
+              ); // hijau
+              break;
+            default:
+              icon = BitmapDescriptor.defaultMarker; // merah default
+          }
+
+          return Marker(
+            markerId: MarkerId(p.id.toString()),
+            position: LatLng(p.latitude!, p.longitude!),
+            icon: icon,
+            infoWindow: InfoWindow(
+              title: p.name,
+              snippet: p.category,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailPlaceScreen(place: p),
+                  ),
+                );
+              },
+            ),
+          );
+        }).toSet();
+
+    setState(() {
+      _markers = newMarkers;
+    });
+  }
+
+  void _filterPlaces(String query) {
+    List<Place> filtered =
+        _allPlaces.where((place) {
+          final nameLower = place.name.toLowerCase();
+          final categoryLower = place.category.toLowerCase();
+          final searchLower = query.toLowerCase();
+          return nameLower.contains(searchLower) ||
+              categoryLower.contains(searchLower);
+        }).toList();
+
+    setState(() {
+      _searchQuery = query;
+      _filteredPlaces = filtered;
+      _setMarkers(_filteredPlaces);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Place>>(
@@ -82,32 +168,41 @@ class _ExploreScreenState extends State<ExploreScreen> {
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
-        final places = snapshot.data ?? [];
-        if (places.isEmpty) {
+
+        if (_allPlaces.isEmpty) {
           return const Center(child: Text('No places found'));
+        }
+
+        List<Place> recommendedPlaces;
+        if (_searchQuery.isEmpty && _currentPosition != null) {
+          recommendedPlaces =
+              _filteredPlaces.where((place) {
+                if (place.latitude == null || place.longitude == null)
+                  return false;
+                final placeLocation = LatLng(place.latitude!, place.longitude!);
+                final distance = calculateDistance(
+                  _currentPosition!,
+                  placeLocation,
+                );
+                return distance <= 10;
+              }).toList();
+        } else {
+          recommendedPlaces = _filteredPlaces;
         }
 
         return Scaffold(
           backgroundColor: Colors.white,
           body: Stack(
             children: [
-              // Google Maps Background
               GoogleMap(
                 initialCameraPosition: CameraPosition(
-                  target:
-                      _currentPosition ??
-                      const LatLng(
-                        0,
-                        0,
-                      ), // default ke koordinat nol (atau bisa diganti)
-                  zoom:
-                      _currentPosition != null
-                          ? 15
-                          : 2, // zoom jauh jika lokasi belum ada
+                  target: _currentPosition ?? const LatLng(0, 0),
+                  zoom: _currentPosition != null ? 15 : 2,
                 ),
                 mapType: MapType.normal,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
+                markers: _markers,
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                   if (_currentPosition != null) {
@@ -120,7 +215,40 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 },
               ),
 
-              // DraggableScrollableSheet untuk konten places
+              // Search bar floating transparan di atas peta
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 8,
+                left: 55,
+                right: 60,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'Search places...',
+                      prefixIcon: Icon(Icons.search),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 14,
+                      ),
+                    ),
+                    onChanged: (value) {
+                      _filterPlaces(value);
+                    },
+                  ),
+                ),
+              ),
+
               DraggableScrollableSheet(
                 initialChildSize: 0.6,
                 minChildSize: 0.3,
@@ -178,14 +306,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                   ),
-                                  itemCount: places.length,
+                                  itemCount: recommendedPlaces.length,
                                   itemBuilder: (context, index) {
-                                    final place = places[index];
+                                    final place = recommendedPlaces[index];
                                     return Container(
                                       width: 180,
                                       margin: EdgeInsets.only(
                                         right:
-                                            index == places.length - 1 ? 0 : 16,
+                                            index ==
+                                                    recommendedPlaces.length - 1
+                                                ? 0
+                                                : 16,
                                       ),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(24),

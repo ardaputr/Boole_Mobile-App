@@ -24,17 +24,14 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     'WITA',
     'WIT',
     'London',
-    'Japan',
-    'Korea',
-    'USA',
-    'AUS',
-    'Dubai',
-    'Mesir',
+    'Tokyo',
+    'New York',
+    'Sydney',
   ];
 
-  String selectedCurrency = 'Rp';
+  String selectedCurrency = 'IDR';
   final List<String> currencyOptions = [
-    'Rp',
+    'IDR',
     'MYR',
     'AUD',
     'USD',
@@ -43,7 +40,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
   ];
 
   final Map<String, double> currencyRates = {
-    'Rp': 1,
+    'IDR': 1,
     'MYR': 0.31,
     'AUD': 0.000094,
     'USD': 0.000067,
@@ -56,12 +53,9 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     'WITA': 8,
     'WIT': 9,
     'London': 0,
-    'Japan': 9,
-    'Korea': 9,
-    'USA': -5,
-    'AUS': 10,
-    'Dubai': 4,
-    'Mesir': 2,
+    'Tokyo': 9,
+    'New York': -5,
+    'Sydney': 10,
   };
 
   bool isTranslating = false;
@@ -194,8 +188,8 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     final rate = currencyRates[currency] ?? 1;
     final converted = priceDouble * rate;
 
-    if (currency == 'Rp') {
-      return 'Rp ${converted.toStringAsFixed(0)}';
+    if (currency == 'IDR') {
+      return 'IDR ${converted.toStringAsFixed(0)}';
     } else {
       return '$currency ${converted.toStringAsFixed(2)}';
     }
