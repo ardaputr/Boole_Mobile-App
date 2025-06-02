@@ -76,7 +76,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final int userId = widget.userData['id'];
-      final url = Uri.parse('http://172.16.81.177:5000/user/$userId');
+      final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
 
       Map<String, dynamic> body = {
         'full_name': _fullNameController.text.trim(),

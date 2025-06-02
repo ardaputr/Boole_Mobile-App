@@ -69,7 +69,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   Future<List<Place>> fetchPlaces() async {
     final response = await http.get(
-      Uri.parse('http://172.16.81.177:5000/places'),
+      Uri.parse('http://192.168.100.199:5000/places'),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -88,7 +88,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           end.longitude,
         ) /
         // Convert meters to kilometers
-        200;
+        300;
   }
 
   void _setMarkers(List<Place> places) {

@@ -31,7 +31,9 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
 
     try {
       // url
-      final url = Uri.parse('http://172.16.81.177:5000/user/${widget.userId}');
+      final url = Uri.parse(
+        'http://192.168.100.199:5000/user/${widget.userId}',
+      );
 
       final response = await http.get(url);
 

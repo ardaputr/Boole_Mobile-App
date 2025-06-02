@@ -89,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       }
       //url
-      final url = Uri.parse('http://172.16.81.177:5000/user/$userId');
+      final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
 
       final response = await http.delete(url);
 

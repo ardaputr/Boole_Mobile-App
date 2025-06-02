@@ -66,8 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 _getGreetingMessage(),
                 style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.white70,
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -82,10 +83,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final hour = DateTime.now().hour;
     if (hour < 12) {
       return 'Good Morning';
-    } else if (hour < 17) {
+    } else if (hour < 15) {
       return 'Good Afternoon';
-    } else {
+    } else if (hour < 18) {
       return 'Good Evening';
+    } else {
+      return 'Good Night';
     }
   }
 
