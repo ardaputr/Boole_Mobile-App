@@ -41,11 +41,11 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
 
   final Map<String, double> currencyRates = {
     'IDR': 1,
-    'MYR': 0.31,
-    'AUD': 0.000094,
-    'USD': 0.000067,
-    'GBP': 0.000058,
-    'EUR': 0.000063,
+    'MYR': 0.00026,
+    'AUD': 0.0000094,
+    'USD': 0.0000611,
+    'GBP': 0.000045,
+    'EUR': 0.000054,
   };
 
   final Map<String, int> timezoneOffsets = {
