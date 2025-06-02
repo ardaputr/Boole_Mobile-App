@@ -74,7 +74,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       // final url = Uri.parse('http://localhost:5000/user/$userId');
       //url
-      final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
+      final url = Uri.parse('http://172.16.81.177:5000/user/$userId');
 
       // Bangun body, sertakan password hanya jika diisi
       Map<String, dynamic> body = {

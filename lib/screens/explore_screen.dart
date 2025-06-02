@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import '../models/place.dart';
 import 'detail_place_screen.dart';
@@ -13,17 +16,51 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   late Future<List<Place>> _placesFuture;
+  final Completer<GoogleMapController> _controller = Completer();
+  LatLng? _currentPosition;
 
   @override
   void initState() {
     super.initState();
     _placesFuture = fetchPlaces();
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      // Check location permission
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return;
+        }
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        _currentPosition = LatLng(position.latitude, position.longitude);
+      });
+
+      // Move camera to current location
+      final GoogleMapController controller = await _controller.future;
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: _currentPosition!, zoom: 15),
+        ),
+      );
+    } catch (e) {
+      print('Error getting location: $e');
+    }
   }
 
   Future<List<Place>> fetchPlaces() async {
     final response = await http.get(
-      //url
-      Uri.parse('http://192.168.100.199:5000/places'),
+      Uri.parse('http://172.16.81.177:5000/places'),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -54,7 +91,36 @@ class _ExploreScreenState extends State<ExploreScreen> {
           backgroundColor: Colors.white,
           body: Stack(
             children: [
-              Container(color: Colors.cyan.shade100),
+              // Google Maps Background
+              GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target:
+                      _currentPosition ??
+                      const LatLng(
+                        0,
+                        0,
+                      ), // default ke koordinat nol (atau bisa diganti)
+                  zoom:
+                      _currentPosition != null
+                          ? 15
+                          : 2, // zoom jauh jika lokasi belum ada
+                ),
+                mapType: MapType.normal,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                onMapCreated: (GoogleMapController controller) {
+                  _controller.complete(controller);
+                  if (_currentPosition != null) {
+                    controller.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(target: _currentPosition!, zoom: 15),
+                      ),
+                    );
+                  }
+                },
+              ),
+
+              // DraggableScrollableSheet untuk konten places
               DraggableScrollableSheet(
                 initialChildSize: 0.6,
                 minChildSize: 0.3,

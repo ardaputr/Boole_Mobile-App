@@ -19,20 +19,18 @@ class _CompassScreenState extends State<CompassScreen> {
 
   double? _latitude;
   double? _longitude;
-  double? _elevation; // altitude
+  double? _elevation;
 
   @override
   void initState() {
     super.initState();
 
-    // Listen kompas
     _compassSubscription = FlutterCompass.events?.listen((event) {
       setState(() {
         _heading = event.heading;
       });
     });
 
-    // Setup lokasi dan permission
     _requestLocationPermissionAndListen();
   }
 
@@ -99,38 +97,40 @@ class _CompassScreenState extends State<CompassScreen> {
             : "Elevation not available";
 
     return Scaffold(
-      backgroundColor: Colors.cyan,
-      appBar: AppBar(backgroundColor: Colors.cyan),
+      backgroundColor: Colors.cyan.shade50,
+      appBar: AppBar(backgroundColor: Colors.cyan.shade50),
       body: SafeArea(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomPaint(
-                size: const Size(320, 320),
-                painter: _CompassPainter(heading),
+                size: const Size(300, 300),
+                painter: _PaleCyanCompassPainter(heading),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
               Text(
                 "${heading.toStringAsFixed(0)}° $directionLabel",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 48,
-                  fontWeight: FontWeight.w900,
+                style: TextStyle(
+                  color: Colors.cyan.shade900,
+                  fontSize: 42,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               Text(
                 "$latitudeStr  $longitudeStr",
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
+                style: TextStyle(color: Colors.cyan.shade700, fontSize: 16),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
-
-              // *** Text "Your Location" dihapus ***
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 elevationStr,
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
+                style: TextStyle(
+                  color: Colors.cyan.shade700.withOpacity(0.7),
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
@@ -140,87 +140,69 @@ class _CompassScreenState extends State<CompassScreen> {
   }
 }
 
-class _CompassPainter extends CustomPainter {
+class _PaleCyanCompassPainter extends CustomPainter {
   final double heading;
 
-  _CompassPainter(this.heading);
+  _PaleCyanCompassPainter(this.heading);
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = math.min(size.width / 2, size.height / 2);
 
-    final paintCircle =
+    // Background gradient pale cyan
+    final gradient = RadialGradient(
+      colors: [Colors.cyan.shade100, Colors.white.withOpacity(0.9)],
+      stops: [0.4, 1],
+    );
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    final paintBackground =
         Paint()
-          ..color = Colors.cyan
+          ..shader = gradient.createShader(rect)
           ..style = PaintingStyle.fill;
 
-    final paintBorder =
+    canvas.drawCircle(center, radius, paintBackground);
+
+    // Outer ring tipis
+    final ringPaint =
         Paint()
-          ..color = Colors.white
-          ..strokeWidth = 4
-          ..style = PaintingStyle.stroke;
+          ..color = Colors.cyan.shade300.withOpacity(0.8)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 4;
 
-    final paintNeedleRed =
+    canvas.drawCircle(center, radius - 3, ringPaint);
+
+    // Ticks kecil & utama
+    final tickPaintSmall =
         Paint()
-          ..color = Colors.red
-          ..strokeWidth = 8
-          ..strokeCap = StrokeCap.round;
-
-    final paintNeedleWhite =
+          ..color = Colors.cyan.shade400.withOpacity(0.7)
+          ..strokeWidth = 1.2;
+    final tickPaintMain =
         Paint()
-          ..color = Colors.white
-          ..strokeWidth = 8
-          ..strokeCap = StrokeCap.round;
+          ..color = Colors.cyan.shade700.withOpacity(0.9)
+          ..strokeWidth = 2.5;
 
-    final paintTicks =
-        Paint()
-          ..color = Colors.white70
-          ..strokeWidth = 2;
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(-heading * math.pi / 180);
 
-    // Background lingkaran hitam gelap
-    canvas.drawCircle(center, radius, paintCircle);
-    // Border lingkaran putih
-    canvas.drawCircle(center, radius, paintBorder);
+    for (int i = 0; i < 360; i += 5) {
+      final isMainTick = (i % 30 == 0);
+      final tickLength = isMainTick ? 15.0 : 8.0;
+      final paint = isMainTick ? tickPaintMain : tickPaintSmall;
 
-    // Gambar garis-garis tick derajat tiap 3°,
-    // dan garis lebih tebal tiap 30°
-    for (int i = 0; i < 360; i += 3) {
-      final tickLength = (i % 30 == 0) ? 15.0 : 7.0;
-      final tickPaint = (i % 30 == 0) ? paintBorder : paintTicks;
-      final angle = i * math.pi / 180;
-
+      final angle = (i - 90) * math.pi / 180;
       final start = Offset(
-        center.dx + (radius - tickLength) * math.cos(angle),
-        center.dy + (radius - tickLength) * math.sin(angle),
+        (radius - tickLength - 10) * math.cos(angle),
+        (radius - tickLength - 10) * math.sin(angle),
       );
       final end = Offset(
-        center.dx + radius * math.cos(angle),
-        center.dy + radius * math.sin(angle),
+        (radius - 10) * math.cos(angle),
+        (radius - 10) * math.sin(angle),
       );
-      canvas.drawLine(start, end, tickPaint);
+
+      canvas.drawLine(start, end, paint);
     }
-
-    // Hitung rotasi jarum kompas (radian, putar berlawanan arah jarum jam)
-    final needleAngle = (heading) * (math.pi / 180) * -1;
-    final needleLength = radius * 0.75;
-
-    final redNeedleEnd = Offset(
-      center.dx + needleLength * math.sin(needleAngle),
-      center.dy + needleLength * math.cos(needleAngle),
-    );
-    final whiteNeedleEnd = Offset(
-      center.dx - needleLength * math.sin(needleAngle),
-      center.dy - needleLength * math.cos(needleAngle),
-    );
-
-    // Jarum merah menunjuk utara
-    canvas.drawLine(center, redNeedleEnd, paintNeedleRed);
-    // Jarum putih menunjuk selatan
-    canvas.drawLine(center, whiteNeedleEnd, paintNeedleWhite);
-
-    // Titik tengah jarum kompas
-    canvas.drawCircle(center, 10, Paint()..color = Colors.grey.shade200);
 
     // Label arah utama N, E, S, W
     final textPainter = TextPainter(
@@ -228,40 +210,90 @@ class _CompassPainter extends CustomPainter {
       textDirection: TextDirection.ltr,
     );
 
-    // Modifikasi posisi label supaya sesuai permintaan:
-    // N bawah, S atas, E kiri, W kanan
     final directions = ['N', 'E', 'S', 'W'];
-    final List<Offset> positions = [
-      // N (bawah)
-      Offset(center.dx, center.dy + radius - 20),
-      // E (kiri)
-      Offset(center.dx - radius + 20, center.dy),
-      // S (atas)
-      Offset(center.dx, center.dy - radius + 20),
-      // W (kanan)
-      Offset(center.dx + radius - 20, center.dy),
-    ];
+    final angles = [0, 90, 180, 270];
 
-    for (int i = 0; i < 4; i++) {
+    final directionTextStyle = TextStyle(
+      color: Colors.cyan.shade900,
+      fontSize: 26,
+      fontWeight: FontWeight.w700,
+      shadows: [
+        Shadow(
+          blurRadius: 2,
+          color: Colors.cyan.shade200.withOpacity(0.7),
+          offset: const Offset(1, 1),
+        ),
+      ],
+    );
+
+    for (int i = 0; i < directions.length; i++) {
+      final angle = (angles[i] - 90) * math.pi / 180;
+      final labelRadius = radius - 50;
+
       textPainter.text = TextSpan(
         text: directions[i],
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-        ),
+        style: directionTextStyle,
       );
       textPainter.layout();
-      final pos = positions[i];
-      textPainter.paint(
-        canvas,
-        pos - Offset(textPainter.width / 2, textPainter.height / 2),
+
+      final pos = Offset(
+        labelRadius * math.cos(angle) - textPainter.width / 2,
+        labelRadius * math.sin(angle) - textPainter.height / 2,
       );
+      textPainter.paint(canvas, pos);
     }
+
+    canvas.restore();
+
+    // Jarum panah segitiga ramping (merah dan putih)
+    final needleLength = radius * 0.75;
+    final needleWidth = 10.0;
+
+    void drawArrowNeedle(Color color, double offsetY) {
+      final paint =
+          Paint()
+            ..color = color
+            ..style = PaintingStyle.fill
+            ..maskFilter = MaskFilter.blur(BlurStyle.normal, 2);
+
+      final path = Path();
+      path.moveTo(center.dx, center.dy + offsetY);
+      path.lineTo(
+        center.dx - needleWidth / 2,
+        center.dy + offsetY + needleLength / 2.8,
+      );
+      path.lineTo(
+        center.dx + needleWidth / 2,
+        center.dy + offsetY + needleLength / 2.8,
+      );
+      path.close();
+
+      final tipPath = Path();
+      tipPath.moveTo(center.dx, center.dy + offsetY - needleLength * 0.7);
+      tipPath.lineTo(center.dx - needleWidth / 2, center.dy + offsetY);
+      tipPath.lineTo(center.dx + needleWidth / 2, center.dy + offsetY);
+      tipPath.close();
+
+      canvas.drawPath(path, paint);
+      canvas.drawPath(tipPath, paint);
+    }
+
+    drawArrowNeedle(Colors.redAccent.shade200, 0);
+    drawArrowNeedle(Colors.white.withOpacity(0.85), needleLength * 0.7);
+
+    // Titik tengah dengan glow cyan
+    final centerCirclePaint =
+        Paint()
+          ..shader = RadialGradient(
+            colors: [Colors.cyan.shade300.withOpacity(0.9), Colors.transparent],
+          ).createShader(Rect.fromCircle(center: center, radius: 12));
+
+    canvas.drawCircle(center, 12, centerCirclePaint);
+    canvas.drawCircle(center, 6, Paint()..color = Colors.cyan.shade900);
   }
 
   @override
-  bool shouldRepaint(covariant _CompassPainter oldDelegate) {
+  bool shouldRepaint(covariant _PaleCyanCompassPainter oldDelegate) {
     return oldDelegate.heading != heading;
   }
 }
