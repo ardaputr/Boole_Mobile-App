@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
 class EditProfileScreen extends StatefulWidget {
@@ -12,6 +14,9 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+
   late TextEditingController _fullNameController;
   late TextEditingController _birthDateController;
   late String _selectedGender;
@@ -48,6 +53,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _uploadImage(int userId) async {
+    if (_imageFile == null) return;
+
+    final url = Uri.parse(
+      'http://192.168.100.199:5000/user/$userId/upload-photo',
+    );
+    var request = http.MultipartRequest('POST', url);
+    request.files.add(
+      await http.MultipartFile.fromPath('photo', _imageFile!.path),
+    );
+    var response = await request.send();
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to upload image');
+    }
   }
 
   Future<void> _selectBirthDate() async {
@@ -98,15 +129,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['message'] != null) {
-          Navigator.pop(context, true);
-        } else {
-          setState(() {
-            _error = 'Update failed';
-            _isLoading = false;
-          });
+        if (_imageFile != null) {
+          await _uploadImage(userId);
         }
+        Navigator.pop(context, true);
       } else {
         setState(() {
           _error = 'Server error: ${response.statusCode}';
@@ -170,6 +196,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            GestureDetector(
+              onTap: _pickImage,
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage:
+                    _imageFile != null
+                        ? FileImage(_imageFile!)
+                        : (widget.userData['photo_url'] != null
+                                ? NetworkImage(
+                                  'http://192.168.100.199:5000${widget.userData['photo_url']}',
+                                )
+                                : null)
+                            as ImageProvider<Object>?,
+                child:
+                    _imageFile == null && widget.userData['photo_url'] == null
+                        ? const Icon(Icons.add_a_photo, size: 50)
+                        : null,
+              ),
+            ),
             _buildTextField(
               label: 'Full Name',
               controller: _fullNameController,
