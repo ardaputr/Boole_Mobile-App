@@ -68,7 +68,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (_imageFile == null) return;
 
     final url = Uri.parse(
-      'http://192.168.100.199:5000/user/$userId/upload-photo',
+      'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId/upload-photo',
     );
     var request = http.MultipartRequest('POST', url);
     request.files.add(
@@ -107,7 +107,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final int userId = widget.userData['id'];
-      final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
+      final url = Uri.parse(
+        'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId',
+      );
 
       Map<String, dynamic> body = {
         'full_name': _fullNameController.text.trim(),
@@ -205,7 +207,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ? FileImage(_imageFile!)
                         : (widget.userData['photo_url'] != null
                                 ? NetworkImage(
-                                  'http://192.168.100.199:5000${widget.userData['photo_url']}',
+                                  'https://boole-boolebe-525057870643.us-central1.run.app${widget.userData['photo_url']}',
                                 )
                                 : null)
                             as ImageProvider<Object>?,

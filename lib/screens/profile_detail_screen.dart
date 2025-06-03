@@ -32,7 +32,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     try {
       // url
       final url = Uri.parse(
-        'http://192.168.100.199:5000/user/${widget.userId}',
+        'https://boole-boolebe-525057870643.us-central1.run.app/user/${widget.userId}',
       );
 
       final response = await http.get(url);
@@ -80,7 +80,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
               backgroundImage:
                   _userData!['photo_url'] != null
                       ? NetworkImage(
-                        'http://192.168.100.199:5000${_userData!['photo_url']}',
+                        'https://boole-boolebe-525057870643.us-central1.run.app${_userData!['photo_url']}',
                       )
                       : NetworkImage(
                         'https://ui-avatars.com/api/?name=${Uri.encodeComponent(_userData!['full_name'])}&background=0D8ABC&color=fff',

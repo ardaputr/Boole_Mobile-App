@@ -5,7 +5,7 @@ import '../models/place.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:another_flushbar/flushbar.dart'; // Tambahkan import Flushbar
+import 'package:another_flushbar/flushbar.dart';
 
 class DetailPlaceScreen extends StatefulWidget {
   final Place place;

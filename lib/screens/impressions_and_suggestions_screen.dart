@@ -165,7 +165,7 @@ class ImpressionsAndSuggestionsScreen extends StatelessWidget {
                 iconColor: Colors.orange.shade700,
                 title: 'Suggestion',
                 content:
-                    'Semoga materi selanjutnya dapat lebih banyak membahas framework Flutter dan praktik langsung membuat aplikasi yang lebih kompleks. Selain itu, harap ada lebih banyak studi kasus yang relevan dengan kebutuhan industri saat ini.',
+                    'Semoga materi selanjutnya dapat lebih banyak membahas framework Flutter dan praktik langsung membuat aplikasi. Selain itu, harap ada lebih banyak studi kasus yang relevan dengan kebutuhan industri saat ini.',
               ),
             ],
           ),
