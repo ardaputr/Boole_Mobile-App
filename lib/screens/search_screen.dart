@@ -12,11 +12,13 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  late Future<List<Place>> _placesFuture;
-  List<Place> _allPlaces = [];
-  String _selectedCategory = 'all'; // default all
-  TextEditingController _searchController = TextEditingController();
+  late Future<List<Place>> _placesFuture; // Future untuk data tempat dari API
+  List<Place> _allPlaces = []; // List lengkap tempat dari API
+  String _selectedCategory = 'all'; // Kategori yang dipilih, default "all"
+  TextEditingController _searchController =
+      TextEditingController(); // Controller input search text
 
+  // List kategori yang dapat dipilih user untuk filter
   final List<Map<String, String>> _categories = [
     {'id': 'all', 'label': 'All'},
     {'id': 'beach', 'label': 'Beach'},
@@ -30,13 +32,18 @@ class _SearchScreenState extends State<SearchScreen> {
     _placesFuture = fetchPlaces();
   }
 
+  // Fungsi fetch data tempat dari API backend
   Future<List<Place>> fetchPlaces() async {
     final response = await http.get(
       Uri.parse(
         'https://boole-boolebe-525057870643.us-central1.run.app/places',
       ),
     );
+    // final response = await http.get(
+    //   Uri.parse('http://192.168.100.199:5000/places'),
+    // );
     if (response.statusCode == 200) {
+      // Jika berhasil, decode JSON dan map ke list Place
       final data = jsonDecode(response.body);
       List placesJson = data['places'];
       _allPlaces = placesJson.map((json) => Place.fromJson(json)).toList();
@@ -46,24 +53,29 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  // Filter list tempat berdasarkan kategori yang dipilih
   List<Place> filterByCategory(String category) {
     if (category == 'all') {
       return _allPlaces;
     }
+    // Filter tempat berdasarkan kategori
     return _allPlaces.where((place) => place.category == category).toList();
   }
 
+  // Filter list tempat berdasarkan kata pencarian
   List<Place> filterBySearch(List<Place> places, String query) {
     if (query.isEmpty) return places;
     return places
         .where(
           (place) =>
               place.name.toLowerCase().contains(query.toLowerCase()) ||
-              place.description.toLowerCase().contains(query.toLowerCase()),
+              place.category.toLowerCase().contains(query.toLowerCase()) ||
+              place.rating.toString().contains(query.toLowerCase()),
         )
         .toList();
   }
 
+  // Widget filter kategori discroll horizontal
   Widget buildCategoryFilters() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -76,18 +88,21 @@ class _SearchScreenState extends State<SearchScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: GestureDetector(
+                    // Saat kategori dipilih, update state dan bersihkan search text
                     onTap: () {
                       setState(() {
                         _selectedCategory = cat['id']!;
                         _searchController.clear();
                       });
                     },
+                    // Tampilan kategori
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
+                        // Warna latar kategori
                         color: isSelected ? Colors.cyan : Colors.transparent,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
@@ -113,7 +128,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // Fungsi konversi waktu HH:mm:ss ke HH:mm
+  // Fungsi konversi waktu HH:mm:ss ke HH:mm (untuk opening hours)
   String formatTimeToHHmm(String time) {
     try {
       final parts = time.split(':');
@@ -127,6 +142,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  // Widget kartu tempat untuk ditampilkan di list
   Widget buildPlaceCard(Place place) {
     return Container(
       width: 180,
@@ -142,6 +158,7 @@ class _SearchScreenState extends State<SearchScreen> {
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           onTap: () {
+            // Navigasi ke halaman detail tempat
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -149,6 +166,7 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             );
           },
+          // Tampilan kartu
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -163,6 +181,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         (context, error, stackTrace) =>
                             const Icon(Icons.broken_image, size: 130),
                   ),
+                  // Tampilan rating
                   Positioned(
                     right: 8,
                     bottom: 8,
@@ -192,6 +211,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ],
               ),
+              // Tampilan nama tempat
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -210,9 +230,11 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
+                    // Tampilan di bawah images
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // Tampilan waktu buka
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -237,6 +259,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                           ],
                         ),
+                        // Tampilan harga
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -248,6 +271,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 color: Colors.grey,
                               ),
                             ),
+                            // Tampilan harga
                             Text(
                               place.ticketPrice != null
                                   ? "Rp ${place.ticketPrice!.toStringAsFixed(0)}"
@@ -281,6 +305,7 @@ class _SearchScreenState extends State<SearchScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
+            // Tampilkan loading indicator
             body: Center(child: CircularProgressIndicator()),
           );
         }
@@ -292,8 +317,9 @@ class _SearchScreenState extends State<SearchScreen> {
         if (_allPlaces.isEmpty) {
           return const Scaffold(body: Center(child: Text('No places found')));
         }
-
+        // Filter tempat berdasarkan kategori yang dipilih
         final filtered = filterByCategory(_selectedCategory);
+        //
         final filteredWithSearch = filterBySearch(
           filtered,
           _searchController.text,
@@ -302,7 +328,7 @@ class _SearchScreenState extends State<SearchScreen> {
         return Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.white,
-            title: const Text('Find in Yogyakarta'),
+            title: const Text('Find Your Destination'),
             titleTextStyle: const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -310,7 +336,8 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             elevation: 0,
           ),
-          backgroundColor: const Color(0xffF8F4F7),
+          // Tampilan body
+          backgroundColor: const Color(0xFFF8F4F7),
           body: Padding(
             padding: const EdgeInsets.only(top: 12),
             child: Column(
@@ -320,8 +347,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Container(
                     height: 42,
+                    // Tampilan pencarian
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
+                      color: Colors.grey.shade300,
                       borderRadius: BorderRadius.circular(24),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -337,6 +365,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
                 buildCategoryFilters(),
+                // Bagian daftar tempat berdasarkan kategori & pencarian
                 Expanded(
                   child:
                       _selectedCategory == 'all'
@@ -350,6 +379,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           )
                           : ListView(
                             children: [
+                              // Jika kategori spesifik, tampilkan hanya section itu
                               buildCategorySection(
                                 _selectedCategory,
                                 _categories.firstWhere(
@@ -367,17 +397,24 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  // Membuat section kategori dengan list kartu tempat secara horizontal
   Widget buildCategorySection(String categoryId, String title) {
-    final filtered = filterByCategory(categoryId);
-    final filteredWithSearch = filterBySearch(filtered, _searchController.text);
+    final filtered = filterByCategory(
+      categoryId,
+    ); // Filter berdasarkan kategori
+    final filteredWithSearch = filterBySearch(
+      filtered,
+      _searchController.text,
+    ); // Filter berdasarkan pencarian
 
     if (filteredWithSearch.isEmpty) {
-      return const SizedBox.shrink();
+      return const SizedBox.shrink(); // Jika kosong, jangan tampilkan apapun
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Judul section kategori
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Text(
@@ -385,6 +422,8 @@ class _SearchScreenState extends State<SearchScreen> {
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
+
+        // ListView horizontal berisi kartu tempat kategori tersebut
         SizedBox(
           height: 210,
           child: ListView.builder(

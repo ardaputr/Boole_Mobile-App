@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Untuk menyimpan data user
 import 'package:http/http.dart' as http;
 import 'profile_detail_screen.dart';
 import 'impressions_and_suggestions_screen.dart';
@@ -19,14 +19,15 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  int? userId;
+  int? userId; // Menyimpan ID user yang diambil dari SharedPreferences
 
   @override
   void initState() {
     super.initState();
-    _loadUserId();
+    _loadUserId(); // Memuat ID user saat aplikasi dijalankan
   }
 
+  // Fungsi mengambil userId dari SharedPreferences
   Future<void> _loadUserId() async {
     final prefs = await SharedPreferences.getInstance();
     final id = prefs.getInt('user_id');
@@ -35,13 +36,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  // Fungsi logout: hapus data login dari SharedPreferences dan kembali ke halaman login
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('user_id');
     await prefs.remove('email');
     await prefs.remove('full_name');
-    // Jangan gunakan prefs.clear() agar wishlist tidak hilang
 
+    // Navigasi ke halaman login dan hapus history halaman sebelumnya
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -49,6 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // Fungsi hapus akun user dengan konfirmasi
   Future<void> _deleteAccount(BuildContext context) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -88,10 +91,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
         return;
       }
-      //url
+      // url
       final url = Uri.parse(
         'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId',
       );
+
+      // final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
 
       final response = await http.delete(url);
 
@@ -99,12 +104,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final data = jsonDecode(response.body);
 
         if (data['message'] != null) {
-          await prefs.clear();
+          await prefs.clear(); // Bersihkan semua data SharedPreferences
 
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(data['message'])));
 
+          // Kembali ke halaman login dan hapus history
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -127,6 +133,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  // Fungsi membuka halaman detail profil jika userId tersedia
   void _openProfileDetail() {
     if (userId != null) {
       Navigator.push(
@@ -149,6 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header info user (nama dan email)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -176,6 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            // List menu profile dengan scrollable jika melebihi batas tinggi layar
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.cyan.shade200),
@@ -188,6 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      // Menu Details (Detail Akun)
                       _buildMenuItem(
                         context,
                         icon: Icons.details_outlined,
@@ -196,6 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         subtitle: 'Complete details of your account',
                         onTap: _openProfileDetail,
                       ),
+                      // Menu Wishlist
                       _buildMenuItem(
                         context,
                         icon: Icons.favorite_border,
@@ -211,6 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           );
                         },
                       ),
+                      // Menu Student
                       _buildMenuItem(
                         context,
                         icon: Icons.school_outlined,
@@ -234,6 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           );
                         },
                       ),
+                      // Menu Impressions and Suggestions
                       _buildMenuItem(
                         context,
                         icon: Icons.feedback_outlined,
@@ -253,6 +266,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           );
                         },
                       ),
+                      // Menu Delete Account
                       _buildMenuItem(
                         context,
                         icon: Icons.delete_outline,
@@ -264,6 +278,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _deleteAccount(context);
                         },
                       ),
+                      // Menu Log out
                       _buildMenuItem(
                         context,
                         icon: Icons.logout,
@@ -285,6 +300,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // Widget pembantu untuk membuat item menu profil yang konsisten
   Widget _buildMenuItem(
     BuildContext context, {
     required IconData icon,

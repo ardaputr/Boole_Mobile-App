@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
 class EditProfileScreen extends StatefulWidget {
-  final Map<String, dynamic> userData;
+  final Map<String, dynamic> userData; // Data user yang akan diedit
 
   const EditProfileScreen({super.key, required this.userData});
 
@@ -14,9 +14,11 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  File? _imageFile;
-  final ImagePicker _picker = ImagePicker();
+  File? _imageFile; // File gambar profil baru yang dipilih user
+  final ImagePicker _picker = ImagePicker(); // Objek untuk mengambil gambar
+  String? _uploadedImageUrl;
 
+  // Controller untuk input text field
   late TextEditingController _fullNameController;
   late TextEditingController _birthDateController;
   late String _selectedGender;
@@ -25,14 +27,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
 
-  bool _passwordVisible = false;
-  bool _isLoading = false;
-  String? _error;
+  bool _passwordVisible = false; // Toggle visibilitas password
+  bool _isLoading = false; // Status loading saat simpan
+  String? _error; // Pesan error
 
   @override
   void initState() {
     super.initState();
     final user = widget.userData;
+    // Inisialisasi controller dengan data dari userData
     _fullNameController = TextEditingController(text: user['full_name'] ?? '');
     _birthDateController = TextEditingController(
       text: user['birth_date'] ?? '',
@@ -46,6 +49,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   void dispose() {
+    // Dispose controller agar tidak memory leak
     _fullNameController.dispose();
     _birthDateController.dispose();
     _countryController.dispose();
@@ -55,6 +59,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  // Fungsi pilih gambar dari gallery
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -64,23 +69,37 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  // Upload gambar profil ke server
   Future<void> _uploadImage(int userId) async {
     if (_imageFile == null) return;
 
     final url = Uri.parse(
       'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId/upload-photo',
     );
+
+    // final url = Uri.parse(
+    //   'http://192.168.100.199:5000/user/$userId/upload-photo',
+    // );
     var request = http.MultipartRequest('POST', url);
     request.files.add(
       await http.MultipartFile.fromPath('photo', _imageFile!.path),
     );
     var response = await request.send();
 
-    if (response.statusCode != 200) {
+    if (response.statusCode == 200) {
+      // Jika berhasil, buat timestamp untuk menghindari cache
+      setState(() {
+        _uploadedImageUrl =
+            'https://boole-boolebe-525057870643.us-central1.run.app${widget.userData['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
+        _imageFile =
+            null; // reset file lokal, supaya pakai network image terbaru
+      });
+    } else {
       throw Exception('Failed to upload image');
     }
   }
 
+  // Pilih tanggal lahir dengan date picker
   Future<void> _selectBirthDate() async {
     final pickedDate = await showDatePicker(
       context: context,
@@ -99,6 +118,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  // Simpan profil ke server
   Future<void> _saveProfile() async {
     setState(() {
       _isLoading = true;
@@ -111,6 +131,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId',
       );
 
+      // final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
+
+      // Data yang dikirim ke server
       Map<String, dynamic> body = {
         'full_name': _fullNameController.text.trim(),
         'birth_date': _birthDateController.text.trim(),
@@ -120,6 +143,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'email': _emailController.text.trim(),
       };
 
+      // Sertakan password hanya jika diisi
       if (_passwordController.text.isNotEmpty) {
         body['password'] = _passwordController.text.trim();
       }
@@ -131,10 +155,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (response.statusCode == 200) {
+        // Jika ada gambar baru, upload gambar
         if (_imageFile != null) {
           await _uploadImage(userId);
         }
-        Navigator.pop(context, true);
+        Navigator.pop(context, true); // Kembali dengan hasil berhasil
       } else {
         setState(() {
           _error = 'Server error: ${response.statusCode}';
@@ -149,6 +174,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  // Widget reusable untuk input text dengan label
   Widget _buildTextField({
     required String label,
     required TextEditingController controller,
@@ -197,6 +223,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          // Avatar profil, bisa tap untuk pilih gambar baru
           children: [
             GestureDetector(
               onTap: _pickImage,
@@ -205,29 +232,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 backgroundImage:
                     _imageFile != null
                         ? FileImage(_imageFile!)
-                        : (widget.userData['photo_url'] != null
-                                ? NetworkImage(
-                                  'https://boole-boolebe-525057870643.us-central1.run.app${widget.userData['photo_url']}',
-                                )
-                                : null)
+                        : (_uploadedImageUrl != null
+                                ? NetworkImage(_uploadedImageUrl!)
+                                : (widget.userData['photo_url'] != null
+                                    ? NetworkImage(
+                                      'https://boole-boolebe-525057870643.us-central1.run.app${widget.userData['photo_url']}',
+                                    )
+                                    : null))
                             as ImageProvider<Object>?,
-                child:
-                    _imageFile == null && widget.userData['photo_url'] == null
-                        ? const Icon(Icons.add_a_photo, size: 50)
-                        : null,
+                child: const Icon(Icons.photo, size: 50, color: Colors.white70),
               ),
             ),
+            // Input field Full Name
             _buildTextField(
               label: 'Full Name',
               controller: _fullNameController,
             ),
             const SizedBox(height: 20),
+            // Input field Email
             _buildTextField(
               label: 'Email',
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 20),
+            // Input field Password dengan tombol show/hide
             _buildTextField(
               label: 'Password (leave blank to keep current)',
               controller: _passwordController,
@@ -244,13 +273,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
             const SizedBox(height: 20),
+            // Input field tanggal lahir, read-only, tap akan membuka date picker
             _buildTextField(
               label: 'Birth Date (YYYY-MM-DD)',
               controller: _birthDateController,
-              readOnly: true,
+              // readOnly: true,
               onTap: _selectBirthDate,
             ),
             const SizedBox(height: 20),
+            // Dropdown untuk pilih jenis kelamin
             Text(
               'Gender',
               style: const TextStyle(
@@ -285,8 +316,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               },
             ),
             const SizedBox(height: 20),
+            // Input field negara
             _buildTextField(label: 'Country', controller: _countryController),
             const SizedBox(height: 20),
+            // Input field nomor telepon
             _buildTextField(
               label: 'Phone Number',
               controller: _phoneController,

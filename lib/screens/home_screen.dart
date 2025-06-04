@@ -4,7 +4,9 @@ import 'explore_screen.dart';
 import 'search_screen.dart';
 import 'compass_screen.dart';
 
+// StatefulWidget untuk halaman utama dengan bottom navigation dan app bar yang dinamis
 class HomeScreen extends StatefulWidget {
+  // Menerima parameter userName dan email dari widget lain
   final String userName;
   final String email;
 
@@ -15,14 +17,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Indeks tab yang sedang aktif pada bottom navigation
   int _currentIndex = 0;
 
+  // List halaman (screens) yang akan dipanggil sesuai tab yang aktif
   late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
 
+    // list halaman dengan widget statis dan profile yang menggunakan data user
     _pages = <Widget>[
       const ExploreScreen(),
       const SearchScreen(),
@@ -31,16 +36,26 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
+  // Fungsi untuk menghasilkan AppBar yang hanya muncul saat tab Explore (index 0) aktif
   PreferredSizeWidget? getAppBar() {
+    // Jika tab selain Explore, kembalikan null (tidak ada app bar)
     if (_currentIndex != 0) return null;
 
+    // Jika Explore aktif, buat app bar dengan desain lain
     return PreferredSize(
+      // panjang app bar
       preferredSize: const Size.fromHeight(kToolbarHeight + 30),
       child: ClipRRect(
+        //border biru app bar
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
         child: Container(
-          color: Colors.cyan,
-          padding: const EdgeInsets.fromLTRB(20, 53, 20, 20),
+          color: Colors.cyan, // background warna cyan
+          padding: const EdgeInsets.fromLTRB(
+            20, // kiri
+            53, // atas
+            20, // kanan
+            20, // bawah
+          ), // padding dalam app bar
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -99,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: getAppBar(),
       body: _pages[_currentIndex],
       bottomNavigationBar: Container(
+        // buttom nav belakang
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.3),
           borderRadius: const BorderRadius.only(
@@ -106,17 +122,16 @@ class _HomeScreenState extends State<HomeScreen> {
             topRight: Radius.circular(24),
           ),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10),
+            BoxShadow(color: Colors.cyan.withOpacity(0.5), blurRadius: 20),
           ],
         ),
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
+            // border buttom nav depan
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
           ),
           child: BottomNavigationBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
             currentIndex: _currentIndex,
             selectedItemColor: Colors.cyan,
             unselectedItemColor: Colors.grey,

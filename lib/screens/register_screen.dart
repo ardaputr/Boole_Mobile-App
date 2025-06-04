@@ -65,6 +65,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     try {
       String url =
           "https://boole-boolebe-525057870643.us-central1.run.app/register";
+
+      // String url = "http://192.168.100.199:5000/register";
+
       var res = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},

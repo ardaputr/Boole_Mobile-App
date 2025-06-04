@@ -18,6 +18,7 @@ class DetailPlaceScreen extends StatefulWidget {
 class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
   late Place place;
 
+  // pilihan zona waktu untuk konversi jam operasional
   String selectedTimezone = 'WIB';
   final List<String> timezoneOptions = [
     'WIB',
@@ -29,6 +30,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     'Sydney',
   ];
 
+  // pilihan konversi mata uang
   String selectedCurrency = 'IDR';
   final List<String> currencyOptions = [
     'IDR',
@@ -39,6 +41,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     'EUR',
   ];
 
+  // Kurs manual untuk konversi harga tiket tgl 2 Juni
   final Map<String, double> currencyRates = {
     'IDR': 1,
     'MYR': 0.00026,
@@ -48,6 +51,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     'EUR': 0.000054,
   };
 
+  // Offset zona waktu untuk konversi jam buka
   final Map<String, int> timezoneOffsets = {
     'WIB': 7,
     'WITA': 8,
@@ -58,21 +62,22 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     'Sydney': 10,
   };
 
-  bool isTranslating = false;
+  bool isTranslating = false; // Loading translate
   bool isTranslated = false;
   String? translatedDescription;
-  late String displayedDescription;
+  late String displayedDescription; // Description yang ditampilkan
 
-  int? userId;
+  int? userId; // user_id dari SharedPreferences
 
   @override
   void initState() {
     super.initState();
     place = widget.place;
     displayedDescription = place.description;
-    _loadUserIdAndFavoriteStatus();
+    _loadUserIdAndFavoriteStatus(); // Cek status wishlist user
   }
 
+  // Load userId dan cek status wishlist dari shared_preferences
   Future<void> _loadUserIdAndFavoriteStatus() async {
     final prefs = await SharedPreferences.getInstance();
     userId = prefs.getInt('user_id');
@@ -90,6 +95,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     });
   }
 
+  // Toggle status favorit pada wishlist
   Future<void> _toggleFavorite() async {
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -129,6 +135,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     ).show(context);
   }
 
+  // Membuka link Google Maps
   void _launchURL(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
@@ -138,13 +145,14 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     }
   }
 
+  // Konversi jam buka
   String convertOpenTime(String openTime, String targetTimezone) {
     try {
       final timeParts = openTime.split(':');
       int hour = int.parse(timeParts[0]);
       int minute = int.parse(timeParts[1]);
 
-      int offsetTarget = timezoneOffsets[targetTimezone] ?? 7;
+      int offsetTarget = timezoneOffsets[targetTimezone] ?? 7; // Default to WIB
       int offsetWIB = 7;
 
       int convertedHour = hour + (offsetTarget - offsetWIB);
@@ -159,6 +167,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     }
   }
 
+  // Konversi jam buka-tutup rentang waktu
   String convertTimeRange(String openingHours, String timezone) {
     if (openingHours == '-' || openingHours.isEmpty) return '-';
 
@@ -175,12 +184,15 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     }
   }
 
+  // Konversi harga ke mata uang tertentu
   String convertCurrency(dynamic price, String currency) {
     if (price == null) return '-';
     double priceDouble;
     try {
       priceDouble =
-          price is int ? price.toDouble() : double.parse(price.toString());
+          price is int
+              ? price.toDouble()
+              : double.parse(price.toString()); // Konversi ke double
     } catch (_) {
       return '-';
     }
@@ -195,6 +207,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     }
   }
 
+  // Translate deskripsi ke Inggris pakai API
   Future<void> translateDescription() async {
     if (isTranslating) return;
     if (place.description.isEmpty) return;
@@ -240,6 +253,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     }
   }
 
+  // Toggle translate
   void toggleTranslate() {
     if (isTranslated) {
       // Jika sudah translate, kembali ke bahasa asli
@@ -255,6 +269,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Tampilkan jam & harga yang sudah dikonversi sesuai pilihan dropdown
     final displayedTime = convertTimeRange(
       place.openingHours ?? '-',
       selectedTimezone,
@@ -272,10 +287,11 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
       ),
       extendBodyBehindAppBar: true,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 100),
+        padding: const EdgeInsets.only(bottom: 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Gambar utama tempat, overlay judul, kategori, rating
             Stack(
               children: [
                 ClipRRect(
@@ -299,6 +315,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                   right: 0,
                   height: 90,
                   child: Container(
+                    // Overlay gradient hitam transparan di atas gambar
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.vertical(
                         bottom: Radius.circular(30),
@@ -319,6 +336,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                   left: 20,
                   right: 20,
                   child: Row(
+                    // Judul, kategori, rating (overlay di gambar)
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
@@ -371,6 +389,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                           ],
                         ),
                       ),
+                      // Rating
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -414,6 +433,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
 
             const SizedBox(height: 16),
 
+            // Row: Jam buka dan Harga tiket + dropdown konversi
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -471,7 +491,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                   ),
 
                   const SizedBox(width: 12),
-
+                  // Harga tiket
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -531,7 +551,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
 
             const SizedBox(height: 16),
 
-            // Description header + translate button
+            // Deskripsi header + translate button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -559,7 +579,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
             ),
 
             const SizedBox(height: 8),
-
+            // Deskripsi
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child:
@@ -573,7 +593,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
             ),
 
             const SizedBox(height: 16),
-
+            // Alamat jika tersedia
             if (place.address != null && place.address!.isNotEmpty) ...[
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
@@ -602,10 +622,12 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
           ],
         ),
       ),
+      // Bottom navigation bar: tombol buka Google Maps & wishlist
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
+            // Tombol buka di Google Maps
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () {
@@ -633,6 +655,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
               ),
             ),
             const SizedBox(width: 12),
+            // Tombol favorit/wishlist
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),

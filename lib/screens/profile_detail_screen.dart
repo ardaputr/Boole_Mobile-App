@@ -16,13 +16,15 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
   String? _error;
+  String? _updatedPhotoUrl;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserDetail();
+    _fetchUserDetail(); // Ambil data user saat aplikasi dijalankan
   }
 
+  // Fungsi async untuk fetch data user dari API
   Future<void> _fetchUserDetail() async {
     setState(() {
       _isLoading = true;
@@ -30,11 +32,9 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     });
 
     try {
-      // url
       final url = Uri.parse(
         'https://boole-boolebe-525057870643.us-central1.run.app/user/${widget.userId}',
       );
-
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -43,27 +43,38 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
           setState(() {
             _userData = data['user'];
             _isLoading = false;
+            // Set updated photo url dengan timestamp supaya reload gambar
+            if (_userData?['photo_url'] != null) {
+              _updatedPhotoUrl =
+                  'https://boole-boolebe-525057870643.us-central1.run.app${_userData!['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
+            } else {
+              _updatedPhotoUrl = null;
+            }
           });
         } else {
           setState(() {
             _error = data['message'] ?? 'Failed to load user data';
             _isLoading = false;
+            _updatedPhotoUrl = null;
           });
         }
       } else {
         setState(() {
           _error = 'Server error: ${response.statusCode}';
           _isLoading = false;
+          _updatedPhotoUrl = null;
         });
       }
     } catch (e) {
       setState(() {
         _error = 'Connection failed: $e';
         _isLoading = false;
+        _updatedPhotoUrl = null;
       });
     }
   }
 
+  // Widget utama konten halaman: loading, error, atau data user
   Widget _buildContent() {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_error != null) return Center(child: Text(_error!));
@@ -74,20 +85,24 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       padding: const EdgeInsets.all(16),
       child: ListView(
         children: [
+          // Avatar user, pakai foto jika ada, jika tidak pakai avatar otomatis dari layanan UI Avatars
           Center(
             child: CircleAvatar(
               radius: 50,
               backgroundImage:
-                  _userData!['photo_url'] != null
-                      ? NetworkImage(
-                        'https://boole-boolebe-525057870643.us-central1.run.app${_userData!['photo_url']}',
-                      )
-                      : NetworkImage(
-                        'https://ui-avatars.com/api/?name=${Uri.encodeComponent(_userData!['full_name'])}&background=0D8ABC&color=fff',
-                      ),
+                  _updatedPhotoUrl != null
+                      ? NetworkImage(_updatedPhotoUrl!)
+                      : (_userData?['photo_url'] != null
+                          ? NetworkImage(
+                            'https://boole-boolebe-525057870643.us-central1.run.app${_userData!['photo_url']}',
+                          )
+                          : NetworkImage(
+                            'https://ui-avatars.com/api/?name=${Uri.encodeComponent(_userData!['full_name'])}&background=0D8ABC&color=fff',
+                          )),
             ),
           ),
           const SizedBox(height: 16),
+          // Nama lengkap user
           Center(
             child: Text(
               _userData!['full_name'] ?? '',
@@ -96,6 +111,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
           ),
           const SizedBox(height: 24),
 
+          // Baris detail user: Tanggal lahir, Jenis kelamin, Kebangsaan, Email, Nomor telepon
           _buildDetailRow('Date of Birth', _userData!['birth_date'] ?? ''),
           _buildDetailRow('Gender', _genderLabel(_userData!['gender'] ?? '')),
           _buildDetailRow('Nationality', _userData!['country'] ?? ''),
@@ -103,12 +119,13 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
           _buildDetailRow('Phone Number', _userData!['phone_number'] ?? ''),
 
           const SizedBox(height: 30),
-
+          // Tombol edit profile, navigasi ke halaman EditProfileScreen
           SizedBox(
             width: double.infinity,
             height: 48,
             child: ElevatedButton.icon(
               onPressed: () async {
+                // Tunggu hasil update dari halaman edit, jika true refresh data
                 final updated = await Navigator.push<bool>(
                   context,
                   MaterialPageRoute(
@@ -136,6 +153,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     );
   }
 
+  // Widget baris detail label dan value (contoh: "Date of Birth" : "01 Jan 2000")
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -159,6 +177,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     );
   }
 
+  // Mengubah kode gender 'M','F','O' menjadi label lengkap
   String _genderLabel(String code) {
     switch (code) {
       case 'M':
