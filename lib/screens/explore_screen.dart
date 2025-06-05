@@ -82,14 +82,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   // Mengambil daftar tempat dari API backend
   Future<List<Place>> fetchPlaces() async {
-    final response = await http.get(
-      Uri.parse(
-        'https://boole-boolebe-525057870643.us-central1.run.app/places',
-      ),
-    );
     // final response = await http.get(
-    //   Uri.parse('http://192.168.100.199:5000/places'),
+    //   Uri.parse(
+    //     'https://boole-boolebe-525057870643.us-central1.run.app/places',
+    //   ),
     // );
+    final response = await http.get(
+      Uri.parse('http://192.168.100.199:5000/places'),
+    );
 
     if (response.statusCode == 200) {
       // Jika berhasil, decode JSON dan map ke objek Place

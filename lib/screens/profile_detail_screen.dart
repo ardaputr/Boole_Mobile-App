@@ -33,7 +33,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
 
     try {
       final url = Uri.parse(
-        'https://boole-boolebe-525057870643.us-central1.run.app/user/${widget.userId}',
+        'http://192.168.100.199:5000/user/${widget.userId}',
       );
       final response = await http.get(url);
 
@@ -46,7 +46,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
             // Set updated photo url dengan timestamp supaya reload gambar
             if (_userData?['photo_url'] != null) {
               _updatedPhotoUrl =
-                  'https://boole-boolebe-525057870643.us-central1.run.app${_userData!['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
+                  'http://192.168.100.199:5000${_userData!['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
             } else {
               _updatedPhotoUrl = null;
             }
@@ -94,7 +94,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
                       ? NetworkImage(_updatedPhotoUrl!)
                       : (_userData?['photo_url'] != null
                           ? NetworkImage(
-                            'https://boole-boolebe-525057870643.us-central1.run.app${_userData!['photo_url']}',
+                            'http://192.168.100.199:5000${_userData!['photo_url']}',
                           )
                           : NetworkImage(
                             'https://ui-avatars.com/api/?name=${Uri.encodeComponent(_userData!['full_name'])}&background=0D8ABC&color=fff',

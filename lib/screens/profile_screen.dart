@@ -92,11 +92,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       }
       // url
-      final url = Uri.parse(
-        'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId',
-      );
+      // final url = Uri.parse(
+      //   'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId',
+      // );
 
-      // final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
+      final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
 
       final response = await http.delete(url);
 

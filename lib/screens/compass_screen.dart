@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart'; // Plugin compass (sensor arah)
 import 'package:location/location.dart';
+import 'sos_page.dart';
 
 class CompassScreen extends StatefulWidget {
   const CompassScreen({super.key});
@@ -113,7 +114,25 @@ class _CompassScreenState extends State<CompassScreen> {
 
     return Scaffold(
       backgroundColor: Colors.cyan.shade50,
-      appBar: AppBar(backgroundColor: Colors.cyan.shade50),
+      appBar: AppBar(
+        backgroundColor: Colors.cyan.shade50,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.redAccent,
+              size: 32,
+            ),
+            tooltip: "SOS",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SOSPage()),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: Column(

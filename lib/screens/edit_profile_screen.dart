@@ -59,9 +59,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  // Fungsi pilih gambar dari gallery
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  // Fungsi untuk menampilkan pilihan gambar kamera/galery
+  Future<void> _showPickImageDialog() async {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Pilih dari Galeri'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text('Ambil dari Kamera'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Fungsi untuk mengambil gambar
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
@@ -73,13 +107,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _uploadImage(int userId) async {
     if (_imageFile == null) return;
 
-    final url = Uri.parse(
-      'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId/upload-photo',
-    );
-
     // final url = Uri.parse(
-    //   'http://192.168.100.199:5000/user/$userId/upload-photo',
+    //   'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId/upload-photo',
     // );
+
+    final url = Uri.parse(
+      'http://192.168.100.199:5000/user/$userId/upload-photo',
+    );
     var request = http.MultipartRequest('POST', url);
     request.files.add(
       await http.MultipartFile.fromPath('photo', _imageFile!.path),
@@ -90,7 +124,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       // Jika berhasil, buat timestamp untuk menghindari cache
       setState(() {
         _uploadedImageUrl =
-            'https://boole-boolebe-525057870643.us-central1.run.app${widget.userData['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
+            'http://192.168.100.199:5000${widget.userData['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
         _imageFile =
             null; // reset file lokal, supaya pakai network image terbaru
       });
@@ -127,9 +161,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final int userId = widget.userData['id'];
-      final url = Uri.parse(
-        'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId',
-      );
+      final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
 
       // final url = Uri.parse('http://192.168.100.199:5000/user/$userId');
 
@@ -226,7 +258,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           // Avatar profil, bisa tap untuk pilih gambar baru
           children: [
             GestureDetector(
-              onTap: _pickImage,
+              onTap: _showPickImageDialog,
               child: CircleAvatar(
                 radius: 50,
                 backgroundImage:
@@ -236,7 +268,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ? NetworkImage(_uploadedImageUrl!)
                                 : (widget.userData['photo_url'] != null
                                     ? NetworkImage(
-                                      'https://boole-boolebe-525057870643.us-central1.run.app${widget.userData['photo_url']}',
+                                      'http://192.168.100.199:5000${widget.userData['photo_url']}',
                                     )
                                     : null))
                             as ImageProvider<Object>?,

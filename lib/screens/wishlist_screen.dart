@@ -54,15 +54,15 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   // Fungsi mengambil semua tempat dari API backend
   Future<List<Place>> fetchAllPlaces() async {
-    final response = await http.get(
-      Uri.parse(
-        'https://boole-boolebe-525057870643.us-central1.run.app/places',
-      ),
-    );
-
     // final response = await http.get(
-    //   Uri.parse('http://192.168.100.199:5000/places'),
+    //   Uri.parse(
+    //     'https://boole-boolebe-525057870643.us-central1.run.app/places',
+    //   ),
     // );
+
+    final response = await http.get(
+      Uri.parse('http://192.168.100.199:5000/places'),
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
