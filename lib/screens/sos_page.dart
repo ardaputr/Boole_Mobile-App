@@ -14,12 +14,7 @@ class _SOSPageState extends State<SOSPage> {
   bool _isFlashing = false;
   bool _isLoading = false;
   String? _error;
-  Timer? _flashTimer; // Timer untuk kedap-kedip
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  Timer? _flashTimer;
 
   Future<void> _startFlashing() async {
     setState(() {
@@ -27,33 +22,31 @@ class _SOSPageState extends State<SOSPage> {
       _error = null;
     });
 
-    // Permission cek
     if (await Permission.camera.request().isGranted) {
       setState(() {
         _isFlashing = true;
       });
 
-      // Timer berkedip setiap 500 ms (kedap-kedip dengan interval)
       _flashTimer = Timer.periodic(const Duration(milliseconds: 500), (
         timer,
       ) async {
         try {
           if (timer.tick % 2 == 0) {
-            await TorchLight.enableTorch(); // Nyalakan flashlight
+            await TorchLight.enableTorch();
           } else {
-            await TorchLight.disableTorch(); // Matikan flashlight
+            await TorchLight.disableTorch();
           }
         } catch (e) {
           setState(() {
-            _error = "Gagal mengakses flashlight!";
+            _error = "Failed to access flashlight!";
             _isFlashing = false;
           });
-          timer.cancel(); // Stop timer jika terjadi error
+          timer.cancel();
         }
       });
     } else {
       setState(() {
-        _error = "Izin kamera dibutuhkan untuk SOS";
+        _error = "Camera permission required for SOS";
       });
     }
 
@@ -65,7 +58,7 @@ class _SOSPageState extends State<SOSPage> {
   Future<void> _stopFlashing() async {
     _flashTimer?.cancel();
     try {
-      await TorchLight.disableTorch(); // Pastikan flashlight dimatikan
+      await TorchLight.disableTorch();
     } catch (_) {}
     setState(() {
       _isFlashing = false;
@@ -81,69 +74,135 @@ class _SOSPageState extends State<SOSPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red.shade50,
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('SOS'),
-        backgroundColor: Colors.red.shade400,
+        title: const Text(
+          'Emergency SOS',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.red[700],
         foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+        ),
       ),
-      body: Center(
-        child:
-            _isLoading
-                ? const CircularProgressIndicator()
-                : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.warning_amber_rounded,
-                      color: Colors.redAccent,
-                      size: 90,
-                    ),
-                    const SizedBox(height: 32),
-                    Text(
-                      _isFlashing ? "Flashlight ON" : "Flashlight OFF",
-                      style: TextStyle(
-                        fontSize: 26,
-                        color: Colors.red.shade900,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (_error != null)
-                      Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(color: Colors.red),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Center(
+          child:
+              _isLoading
+                  ? const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  )
+                  : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.red[50],
+                        ),
+                        padding: const EdgeInsets.all(24),
+                        child: Icon(
+                          Icons.emergency,
+                          size: 80,
+                          color:
+                              _isFlashing ? Colors.red[700] : Colors.red[400],
                         ),
                       ),
-                    const SizedBox(height: 34),
-                    ElevatedButton.icon(
-                      icon: Icon(
-                        _isFlashing ? Icons.flash_off : Icons.flash_on,
-                      ),
-                      label: Text(_isFlashing ? "Turn Off SOS" : "Turn On SOS"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 18,
-                        ),
-                        textStyle: const TextStyle(fontSize: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                      const SizedBox(height: 32),
+                      Text(
+                        _isFlashing ? "SOS ACTIVE" : "EMERGENCY SIGNAL",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color:
+                              _isFlashing ? Colors.red[700] : Colors.grey[800],
                         ),
                       ),
-                      onPressed: () async {
-                        if (_isFlashing) {
-                          await _stopFlashing();
-                        } else {
-                          await _startFlashing();
-                        }
-                      },
-                    ),
-                  ],
-                ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _isFlashing
+                            ? "Flashing on"
+                            : "Press button to activate SOS mode",
+                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      ),
+                      if (_error != null) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.red[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error_outline, color: Colors.red[700]),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  _error!,
+                                  style: TextStyle(
+                                    color: Colors.red[700],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 32),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                _isFlashing ? Colors.red[700] : Colors.red[400],
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 2,
+                          ),
+                          onPressed: () async {
+                            if (_isFlashing) {
+                              await _stopFlashing();
+                            } else {
+                              await _startFlashing();
+                            }
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _isFlashing ? Icons.flash_off : Icons.flash_on,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                _isFlashing ? "STOP EMERGENCY" : "ACTIVATE SOS",
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "In case of emergency, use this signal to call for help",
+                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+        ),
       ),
     );
   }

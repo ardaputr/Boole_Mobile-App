@@ -113,26 +113,30 @@ class _CompassScreenState extends State<CompassScreen> {
             : "Elevation not available";
 
     return Scaffold(
-      backgroundColor: Colors.cyan.shade50,
+      backgroundColor: Colors.cyan.shade200,
       appBar: AppBar(
-        backgroundColor: Colors.cyan.shade50,
+        backgroundColor: Colors.cyan.shade200,
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.warning_amber_rounded,
-              color: Colors.redAccent,
-              size: 32,
+          Padding(
+            padding: const EdgeInsets.only(right: 5),
+            child: IconButton(
+              icon: Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.redAccent,
+                size: 32,
+              ),
+              tooltip: "SOS",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SOSPage()),
+                );
+              },
             ),
-            tooltip: "SOS",
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SOSPage()),
-              );
-            },
           ),
         ],
       ),
+
       body: SafeArea(
         child: Center(
           child: Column(
@@ -148,7 +152,7 @@ class _CompassScreenState extends State<CompassScreen> {
               Text(
                 "${heading.toStringAsFixed(0)}° $directionLabel",
                 style: TextStyle(
-                  color: Colors.cyan.shade900,
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   fontSize: 42,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 2,
@@ -158,7 +162,10 @@ class _CompassScreenState extends State<CompassScreen> {
               // Teks koordinat latitude dan longitude
               Text(
                 "$latitudeStr  $longitudeStr",
-                style: TextStyle(color: Colors.cyan.shade700, fontSize: 16),
+                style: TextStyle(
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                  fontSize: 16,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
@@ -166,8 +173,8 @@ class _CompassScreenState extends State<CompassScreen> {
               Text(
                 elevationStr,
                 style: TextStyle(
-                  color: Colors.cyan.shade700.withOpacity(0.7),
-                  fontSize: 14,
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                  fontSize: 16,
                 ),
               ),
             ],
@@ -191,7 +198,7 @@ class _PaleCyanCompassPainter extends CustomPainter {
 
     // Background gradient pale cyan
     final gradient = RadialGradient(
-      colors: [Colors.cyan.shade100, Colors.white.withOpacity(0.9)],
+      colors: [Colors.cyan.shade200, Colors.white.withOpacity(0.9)],
       stops: [0.4, 1],
     );
     final rect = Rect.fromCircle(center: center, radius: radius);
