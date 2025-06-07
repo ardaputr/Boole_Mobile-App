@@ -42,14 +42,14 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
   ];
 
   // Kurs manual untuk konversi harga tiket tgl 2 Juni
-  final Map<String, double> currencyRates = {
-    'IDR': 1,
-    'MYR': 0.00026,
-    'AUD': 0.0000094,
-    'USD': 0.0000611,
-    'GBP': 0.000045,
-    'EUR': 0.000054,
-  };
+  // final Map<String, double> currencyRates = {
+  //   'IDR': 1,
+  //   'MYR': 0.00026,
+  //   'AUD': 0.0000094,
+  //   'USD': 0.0000611,
+  //   'GBP': 0.000045,
+  //   'EUR': 0.000054,
+  // };
 
   // Offset zona waktu untuk konversi jam buka
   final Map<String, int> timezoneOffsets = {
@@ -66,6 +66,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
   bool isTranslated = false;
   String? translatedDescription;
   late String displayedDescription; // Description yang ditampilkan
+  double? exchangeRate;
 
   int? userId; // user_id dari SharedPreferences
 
@@ -75,6 +76,19 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     place = widget.place;
     displayedDescription = place.description;
     _loadUserIdAndFavoriteStatus(); // Cek status wishlist user
+    _loadExchangeRate();
+  }
+
+  // Load exchange rate saat pertama kali
+  Future<void> _loadExchangeRate() async {
+    try {
+      final rate = await fetchExchangeRate('IDR', selectedCurrency);
+      setState(() {
+        exchangeRate = rate;
+      });
+    } catch (e) {
+      print('Error loading exchange rate: $e');
+    }
   }
 
   // Load userId dan cek status wishlist dari shared_preferences
@@ -145,6 +159,37 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     }
   }
 
+  Future<double> fetchExchangeRate(
+    String baseCurrency,
+    String targetCurrency,
+  ) async {
+    if (baseCurrency == targetCurrency) return 1.0;
+
+    const String apiKey =
+        '349d5277aaee15eb8f659fc2'; // Ganti dengan API Key Anda
+    final url = Uri.parse(
+      'https://v6.exchangerate-api.com/v6/$apiKey/latest/$baseCurrency',
+    );
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['result'] == 'success') {
+          return data['conversion_rates'][targetCurrency]?.toDouble() ?? 1.0;
+        } else {
+          throw Exception('Failed to load exchange rates');
+        }
+      } else {
+        throw Exception('Failed to load exchange rates');
+      }
+    } catch (e) {
+      print('Error fetching exchange rate: $e');
+      return 1.0; // Return default rate if error
+    }
+  }
+
   // Konversi jam buka
   String convertOpenTime(String openTime, String targetTimezone) {
     try {
@@ -185,27 +230,27 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
   }
 
   // Konversi harga ke mata uang tertentu
-  String convertCurrency(dynamic price, String currency) {
-    if (price == null) return '-';
-    double priceDouble;
-    try {
-      priceDouble =
-          price is int
-              ? price.toDouble()
-              : double.parse(price.toString()); // Konversi ke double
-    } catch (_) {
-      return '-';
-    }
+  // String convertCurrency(dynamic price, String currency) {
+  //   if (price == null) return '-';
+  //   double priceDouble;
+  //   try {
+  //     priceDouble =
+  //         price is int
+  //             ? price.toDouble()
+  //             : double.parse(price.toString()); // Konversi ke double
+  //   } catch (_) {
+  //     return '-';
+  //   }
 
-    final rate = currencyRates[currency] ?? 1;
-    final converted = priceDouble * rate;
+  //   final rate = currencyRates[currency] ?? 1;
+  //   final converted = priceDouble * rate;
 
-    if (currency == 'IDR') {
-      return 'IDR ${converted.toStringAsFixed(0)}';
-    } else {
-      return '$currency ${converted.toStringAsFixed(2)}';
-    }
-  }
+  //   if (currency == 'IDR') {
+  //     return 'IDR ${converted.toStringAsFixed(0)}';
+  //   } else {
+  //     return '$currency ${converted.toStringAsFixed(2)}';
+  //   }
+  // }
 
   // Translate deskripsi ke Inggris pakai API
   Future<void> translateDescription() async {
@@ -267,6 +312,24 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     }
   }
 
+  // Widget untuk menampilkan harga yang sudah dikonversi
+  Widget buildPriceDisplay() {
+    if (exchangeRate == null) {
+      return const CircularProgressIndicator();
+    }
+
+    // Null safety check untuk ticketPrice
+    final ticketPrice = place.ticketPrice ?? 0.0;
+    final convertedPrice = ticketPrice * exchangeRate!;
+
+    return Text(
+      selectedCurrency == 'IDR'
+          ? 'IDR ${convertedPrice.toStringAsFixed(0)}'
+          : '$selectedCurrency ${convertedPrice.toStringAsFixed(2)}',
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Tampilkan jam & harga yang sudah dikonversi sesuai pilihan dropdown
@@ -274,7 +337,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
       place.openingHours ?? '-',
       selectedTimezone,
     );
-    final displayedPrice = convertCurrency(place.ticketPrice, selectedCurrency);
+    // final displayedPrice = convertCurrency(place.ticketPrice, selectedCurrency);
 
     return Scaffold(
       appBar: AppBar(
@@ -509,17 +572,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                             style: TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            convertCurrency(
-                              place.ticketPrice,
-                              selectedCurrency,
-                            ),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
+                          buildPriceDisplay(),
                           DropdownButton<String>(
                             value: selectedCurrency,
                             isExpanded: true,
@@ -533,11 +586,24 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                                       ),
                                     )
                                     .toList(),
-                            onChanged: (val) {
+                            onChanged: (val) async {
                               if (val != null) {
                                 setState(() {
                                   selectedCurrency = val;
+                                  exchangeRate = null; // Reset exchange rate
                                 });
+                                // Load new exchange rate
+                                try {
+                                  final rate = await fetchExchangeRate(
+                                    'IDR',
+                                    val,
+                                  );
+                                  setState(() {
+                                    exchangeRate = rate;
+                                  });
+                                } catch (e) {
+                                  print('Error loading exchange rate: $e');
+                                }
                               }
                             },
                           ),
