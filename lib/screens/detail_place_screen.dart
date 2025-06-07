@@ -505,7 +505,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        vertical: 12,
+                        vertical: 8,
                         horizontal: 8,
                       ),
                       decoration: BoxDecoration(
