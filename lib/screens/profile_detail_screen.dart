@@ -32,7 +32,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     });
 
     try {
-      final url = Uri.parse('http://172.16.103.77:5000/user/${widget.userId}');
+      final url = Uri.parse('http://192.168.1.14:5000/user/${widget.userId}');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -44,7 +44,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
             // Set updated photo url dengan timestamp supaya reload gambar
             if (_userData?['photo_url'] != null) {
               _updatedPhotoUrl =
-                  'http://172.16.103.77:5000${_userData!['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
+                  'http://192.168.1.14:5000${_userData!['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
             } else {
               _updatedPhotoUrl = null;
             }
@@ -92,7 +92,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
                       ? NetworkImage(_updatedPhotoUrl!)
                       : (_userData?['photo_url'] != null
                           ? NetworkImage(
-                            'http://172.16.103.77:5000${_userData!['photo_url']}',
+                            'http://192.168.1.14:5000${_userData!['photo_url']}',
                           )
                           : NetworkImage(
                             'https://ui-avatars.com/api/?name=${Uri.encodeComponent(_userData!['full_name'])}&background=0D8ABC&color=fff',

@@ -70,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     // final url = "https://boole-boolebe-525057870643.us-central1.run.app/login";
-    final url = "http://172.16.103.77:5000/login";
+    final url = "http://192.168.1.14:5000/login";
 
     try {
       final response = await http.post(

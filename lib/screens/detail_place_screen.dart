@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/place.dart';
 import 'package:intl/intl.dart';
@@ -40,16 +41,6 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     'GBP',
     'EUR',
   ];
-
-  // Kurs manual untuk konversi harga tiket tgl 2 Juni
-  // final Map<String, double> currencyRates = {
-  //   'IDR': 1,
-  //   'MYR': 0.00026,
-  //   'AUD': 0.0000094,
-  //   'USD': 0.0000611,
-  //   'GBP': 0.000045,
-  //   'EUR': 0.000054,
-  // };
 
   // Offset zona waktu untuk konversi jam buka
   final Map<String, int> timezoneOffsets = {
@@ -117,36 +108,71 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
       );
       return;
     }
+
     final prefs = await SharedPreferences.getInstance();
     final key = 'wishlist_user_$userId';
     final favList = prefs.getStringList(key) ?? [];
 
+    bool isAdd = false;
     setState(() {
       if (place.isFavorite) {
         favList.remove(place.id.toString());
         place.isFavorite = false;
+        isAdd = false;
       } else {
         favList.add(place.id.toString());
         place.isFavorite = true;
+        isAdd = true;
       }
     });
 
     await prefs.setStringList(key, favList);
+    await showLocalNotification(place.name, isAdd);
 
-    // Tampilkan notifikasi Flushbar saat tambah/hapus wishlist
-    Flushbar(
-      message:
-          place.isFavorite
-              ? 'Place successfully added to wishlist'
-              : 'Place successfully removed from wishlist',
-      icon: const Icon(Icons.favorite, color: Colors.white),
-      duration: const Duration(seconds: 3),
-      flushbarPosition: FlushbarPosition.TOP,
-      margin: const EdgeInsets.all(8),
-      borderRadius: BorderRadius.circular(10),
-      backgroundColor: Colors.cyan,
-      animationDuration: const Duration(milliseconds: 500),
-    ).show(context);
+    // Flushbar(
+    //   message:
+    //       isAdd
+    //           ? 'Place successfully added to wishlist'
+    //           : 'Place successfully removed from wishlist',
+    //   icon: Icon(Icons.favorite, color: isAdd ? Colors.red : Colors.grey),
+    //   duration: const Duration(seconds: 3),
+    //   flushbarPosition: FlushbarPosition.TOP,
+    //   margin: const EdgeInsets.all(8),
+    //   borderRadius: BorderRadius.circular(10),
+    //   backgroundColor: Colors.cyan,
+    //   animationDuration: const Duration(milliseconds: 500),
+    // ).show(context);
+  }
+
+  //notif
+  Future<void> showLocalNotification(String placeName, bool isAdd) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+          'favorite_channel_id',
+          'Favorite Notifications',
+          channelDescription: 'Notifikasi setelah klik favorite',
+          importance: Importance.max,
+          priority: Priority.high,
+          ticker: 'ticker',
+        );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    final String title =
+        isAdd ? '🎉 Added to Favorites' : '❌ Removed from Favorites';
+    final String message =
+        isAdd
+            ? '$placeName successfully added to wishlist'
+            : '$placeName removed from wishlist';
+
+    await FlutterLocalNotificationsPlugin().show(
+      0,
+      title,
+      message,
+      platformChannelSpecifics,
+    );
   }
 
   // Membuka link Google Maps
@@ -228,29 +254,6 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
       return convertOpenTime(openingHours.trim(), timezone);
     }
   }
-
-  // Konversi harga ke mata uang tertentu
-  // String convertCurrency(dynamic price, String currency) {
-  //   if (price == null) return '-';
-  //   double priceDouble;
-  //   try {
-  //     priceDouble =
-  //         price is int
-  //             ? price.toDouble()
-  //             : double.parse(price.toString()); // Konversi ke double
-  //   } catch (_) {
-  //     return '-';
-  //   }
-
-  //   final rate = currencyRates[currency] ?? 1;
-  //   final converted = priceDouble * rate;
-
-  //   if (currency == 'IDR') {
-  //     return 'IDR ${converted.toStringAsFixed(0)}';
-  //   } else {
-  //     return '$currency ${converted.toStringAsFixed(2)}';
-  //   }
-  // }
 
   // Translate deskripsi ke Inggris pakai API
   Future<void> translateDescription() async {

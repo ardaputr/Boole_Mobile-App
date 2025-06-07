@@ -88,7 +88,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     //   ),
     // );
     final response = await http.get(
-      Uri.parse('http://172.16.103.77:5000/places'),
+      Uri.parse('http://192.168.1.14:5000/places'),
     );
 
     if (response.statusCode == 200) {

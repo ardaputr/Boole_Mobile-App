@@ -111,9 +111,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     //   'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId/upload-photo',
     // );
 
-    final url = Uri.parse(
-      'http://172.16.103.77:5000/user/$userId/upload-photo',
-    );
+    final url = Uri.parse('http://192.168.1.14:5000/user/$userId/upload-photo');
     var request = http.MultipartRequest('POST', url);
     request.files.add(
       await http.MultipartFile.fromPath('photo', _imageFile!.path),
@@ -124,7 +122,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       // Jika berhasil, buat timestamp untuk menghindari cache
       setState(() {
         _uploadedImageUrl =
-            'http://172.16.103.77:5000${widget.userData['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
+            'http://192.168.1.14:5000${widget.userData['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
         _imageFile =
             null; // reset file lokal, supaya pakai network image terbaru
       });
@@ -161,9 +159,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final int userId = widget.userData['id'];
-      final url = Uri.parse('http://172.16.103.77:5000/user/$userId');
+      final url = Uri.parse('http://192.168.1.14:5000/user/$userId');
 
-      // final url = Uri.parse('http://172.16.103.77:5000/user/$userId');
+      // final url = Uri.parse('http://192.168.1.14:5000/user/$userId');
 
       // Data yang dikirim ke server
       Map<String, dynamic> body = {
@@ -268,7 +266,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ? NetworkImage(_uploadedImageUrl!)
                                 : (widget.userData['photo_url'] != null
                                     ? NetworkImage(
-                                      'http://172.16.103.77:5000${widget.userData['photo_url']}',
+                                      'http://192.168.1.14:5000${widget.userData['photo_url']}',
                                     )
                                     : null))
                             as ImageProvider<Object>?,
