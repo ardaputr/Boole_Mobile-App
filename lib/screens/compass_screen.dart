@@ -122,7 +122,7 @@ class _CompassScreenState extends State<CompassScreen> {
             child: IconButton(
               icon: Icon(
                 Icons.warning_amber_rounded,
-                color: Colors.redAccent,
+                color: Colors.red, // Warna merah untuk ikon SOS
                 size: 32,
               ),
               tooltip: "SOS",
@@ -152,7 +152,12 @@ class _CompassScreenState extends State<CompassScreen> {
               Text(
                 "${heading.toStringAsFixed(0)}° $directionLabel",
                 style: TextStyle(
-                  color: const Color.fromARGB(255, 255, 255, 255),
+                  color: const Color.fromARGB(
+                    255,
+                    255,
+                    255,
+                    255,
+                  ), // Warna angka derajat
                   fontSize: 42,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 2,
@@ -163,7 +168,12 @@ class _CompassScreenState extends State<CompassScreen> {
               Text(
                 "$latitudeStr  $longitudeStr",
                 style: TextStyle(
-                  color: const Color.fromARGB(255, 255, 255, 255),
+                  color: const Color.fromARGB(
+                    255,
+                    255,
+                    255,
+                    255,
+                  ), // Warna teks koordinat
                   fontSize: 16,
                 ),
                 textAlign: TextAlign.center,
@@ -173,7 +183,12 @@ class _CompassScreenState extends State<CompassScreen> {
               Text(
                 elevationStr,
                 style: TextStyle(
-                  color: const Color.fromARGB(255, 255, 255, 255),
+                  color: const Color.fromARGB(
+                    255,
+                    255,
+                    255,
+                    255,
+                  ), // Warna teks elevasi
                   fontSize: 16,
                 ),
               ),
@@ -198,6 +213,7 @@ class _PaleCyanCompassPainter extends CustomPainter {
 
     // Background gradient pale cyan
     final gradient = RadialGradient(
+      // Warna gradasi dalam kompas
       colors: [Colors.cyan.shade200, Colors.white.withOpacity(0.9)],
       stops: [0.4, 1],
     );
@@ -212,6 +228,7 @@ class _PaleCyanCompassPainter extends CustomPainter {
     // Outer ring tipis
     final ringPaint =
         Paint()
+          // warna ring luar kompas
           ..color = Colors.cyan.shade300.withOpacity(0.8)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 4;
@@ -221,10 +238,12 @@ class _PaleCyanCompassPainter extends CustomPainter {
     // Ticks kecil & utama
     final tickPaintSmall =
         Paint()
+          // Warna untuk tick kecil
           ..color = Colors.cyan.shade400.withOpacity(0.7)
           ..strokeWidth = 1.2;
     final tickPaintMain =
         Paint()
+          // Warna untuk tick utama
           ..color = Colors.cyan.shade700.withOpacity(0.9)
           ..strokeWidth = 2.5;
 
@@ -261,16 +280,10 @@ class _PaleCyanCompassPainter extends CustomPainter {
     final angles = [0, 90, 180, 270];
 
     final directionTextStyle = TextStyle(
-      color: Colors.cyan.shade900,
+      // warna teks untuk label arah
+      color: Colors.cyan.shade700,
       fontSize: 26,
       fontWeight: FontWeight.w700,
-      shadows: [
-        Shadow(
-          blurRadius: 2,
-          color: Colors.cyan.shade200.withOpacity(0.7),
-          offset: const Offset(1, 1),
-        ),
-      ],
     );
 
     for (int i = 0; i < directions.length; i++) {
@@ -325,7 +338,7 @@ class _PaleCyanCompassPainter extends CustomPainter {
       canvas.drawPath(tipPath, paint);
     }
 
-    // Gambar jarum merah (arah utara) dan putih (arah selatan)
+    // warna jarum merah (arah utara) dan putih (arah selatan)
     drawArrowNeedle(Colors.redAccent.shade200, 0);
     drawArrowNeedle(Colors.white.withOpacity(0.85), needleLength * 0.7);
 
@@ -333,10 +346,12 @@ class _PaleCyanCompassPainter extends CustomPainter {
     final centerCirclePaint =
         Paint()
           ..shader = RadialGradient(
+            // Gradasi warna untuk titik tengah
             colors: [Colors.cyan.shade300.withOpacity(0.9), Colors.transparent],
           ).createShader(Rect.fromCircle(center: center, radius: 12));
 
     canvas.drawCircle(center, 12, centerCirclePaint);
+    // Titik tengah kecil
     canvas.drawCircle(center, 6, Paint()..color = Colors.cyan.shade900);
   }
 

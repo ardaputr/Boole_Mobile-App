@@ -54,14 +54,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   // Fungsi mengambil semua tempat dari API backend
   Future<List<Place>> fetchAllPlaces() async {
-    // final response = await http.get(
-    //   Uri.parse(
-    //     'https://boole-boolebe-525057870643.us-central1.run.app/places',
-    //   ),
-    // );
-
     final response = await http.get(
-      Uri.parse('http://192.168.1.14:5000/places'),
+      Uri.parse(
+        'https://boole-boolebe-525057870643.us-central1.run.app/places',
+      ),
     );
 
     if (response.statusCode == 200) {
@@ -77,7 +73,11 @@ class _WishlistScreenState extends State<WishlistScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Wishlist')),
+      appBar: AppBar(
+        title: const Text('Wishlist'),
+        backgroundColor: Colors.white,
+      ),
+      backgroundColor: Colors.white,
       body:
           wishlistPlaces.isEmpty
               ? const Center(child: Text('Your wishlist is empty'))

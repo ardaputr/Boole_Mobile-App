@@ -56,7 +56,11 @@ class StudentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Student Profile')),
+      appBar: AppBar(
+        title: const Text('Student Profile'),
+        backgroundColor: Colors.white,
+      ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(

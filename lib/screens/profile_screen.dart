@@ -91,12 +91,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
         return;
       }
-      // url
-      // final url = Uri.parse(
-      //   'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId',
-      // );
-
-      final url = Uri.parse('http://192.168.1.14:5000/user/$userId');
+      final url = Uri.parse(
+        'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId',
+      );
 
       final response = await http.delete(url);
 
@@ -150,7 +147,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        title: const Text('Profile'), // + style (('style'))
+        backgroundColor: Colors.white,
+      ),
+      // Warna latar belakang AppBar
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -161,6 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
+                // warna latar belakang nama,email
                 color: Colors.cyan,
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -172,13 +175,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
+                      // warna teks nama
                       color: Colors.white,
                     ),
                   ),
                   const SizedBox(),
                   Text(
                     widget.email,
-                    style: const TextStyle(fontSize: 14, color: Colors.white70),
+                    // warna teks email
+                    style: const TextStyle(fontSize: 16, color: Colors.white70),
                   ),
                 ],
               ),
@@ -187,6 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // List menu profile dengan scrollable jika melebihi batas tinggi layar
             Container(
               decoration: BoxDecoration(
+                // warna border
                 border: Border.all(color: Colors.cyan.shade200),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -205,11 +211,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: 'Details',
                         subtitle: 'Complete details of your account',
                         onTap: _openProfileDetail,
+                        //titleColor: Colors.blue, // Warna title
+                        //subtitleColor: Colors.grey, // Warna subtitle
+                        //cardColor: Colors.white, // Warna card
                       ),
                       // Menu Wishlist
                       _buildMenuItem(
                         context,
                         icon: Icons.favorite_border,
+                        iconColor: Colors.pink.shade700,
                         iconBgColor: Colors.pink.shade100,
                         title: 'Wishlist',
                         subtitle: 'Places you want to visit',
@@ -301,6 +311,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // Widget pembantu untuk membuat item menu profil yang konsisten
+  //   Widget _buildMenuItem(
+  //     BuildContext context, {
+  //     required IconData icon,
+  //     required Color iconBgColor,
+  //     required String title,
+  //     required String subtitle,
+  //     VoidCallback? onTap,
+  //     Color? iconColor,
+  //   }) {
+  //     return Card(
+  //       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+  //       child: ListTile(
+  //         onTap: onTap,
+  //         leading: CircleAvatar(
+  //           backgroundColor: iconBgColor,
+  //           child: Icon(icon, color: iconColor ?? Colors.cyan),
+  //         ),
+  //         title: Text(title),
+  //         subtitle: Text(subtitle),
+  //         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+  //       ),
+  //     );
+  //   }
+  // }
+
   Widget _buildMenuItem(
     BuildContext context, {
     required IconData icon,
@@ -309,18 +345,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String subtitle,
     VoidCallback? onTap,
     Color? iconColor,
+    Color? cardColor, // Parameter untuk warna card
+    Color? titleColor, // Parameter untuk warna title
+    Color? subtitleColor, // Parameter untuk warna subtitle
   }) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      color: cardColor ?? Colors.white, // Ganti warna card
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
           backgroundColor: iconBgColor,
           child: Icon(icon, color: iconColor ?? Colors.cyan),
         ),
-        title: Text(title),
-        subtitle: Text(subtitle),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w400,
+            color:
+                titleColor ??
+                const Color.fromARGB(255, 0, 0, 0), // Ganti warna title
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            color:
+                subtitleColor ?? Colors.grey.shade600, // Ganti warna subtitle
+          ),
+        ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       ),
     );

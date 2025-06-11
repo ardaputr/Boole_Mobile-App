@@ -74,15 +74,14 @@ class _SOSPageState extends State<SOSPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           'Emergency SOS',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold), // + color
         ),
         backgroundColor: Colors.red[700],
         foregroundColor: Colors.white,
-        elevation: 0,
         centerTitle: true,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
@@ -102,12 +101,14 @@ class _SOSPageState extends State<SOSPage> {
                       Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
+                          // background color icon
                           color: Colors.red[50],
                         ),
                         padding: const EdgeInsets.all(24),
                         child: Icon(
                           Icons.emergency,
                           size: 80,
+                          // color icon
                           color:
                               _isFlashing ? Colors.red[700] : Colors.red[400],
                         ),
@@ -118,6 +119,7 @@ class _SOSPageState extends State<SOSPage> {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
+                          // text color
                           color:
                               _isFlashing ? Colors.red[700] : Colors.grey[800],
                         ),
@@ -160,8 +162,10 @@ class _SOSPageState extends State<SOSPage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
+                            // button background color
                             backgroundColor:
                                 _isFlashing ? Colors.red[700] : Colors.red[400],
+                            // button text color
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
@@ -179,6 +183,7 @@ class _SOSPageState extends State<SOSPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              // icon flashlight
                               Icon(
                                 _isFlashing ? Icons.flash_off : Icons.flash_on,
                               ),

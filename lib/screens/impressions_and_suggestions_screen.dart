@@ -2,29 +2,19 @@ import 'package:flutter/material.dart';
 
 class ImpressionsAndSuggestionsScreen extends StatelessWidget {
   const ImpressionsAndSuggestionsScreen({super.key});
-
-  Widget sectionTitle(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-          color: Colors.black87,
-          letterSpacing: 1.1,
-        ),
-      ),
-    );
-  }
-
   Widget impressionOrSuggestionCard({
     required IconData icon,
     required String title,
     required String content,
     Color? iconColor,
+    required Color cardColor,
+    required Color titleColor,
+    required Color contentColor,
   }) {
     return Card(
+      // warna card
+      // color: Colors.grey.shade200,
+      color: cardColor,
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -41,18 +31,20 @@ class ImpressionsAndSuggestionsScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
+                      color: titleColor,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     content,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       height: 1.4,
-                      color: Colors.black87,
+                      // color: titleColor,
+                      color: contentColor,
                     ),
                     textAlign: TextAlign.justify,
                   ),
@@ -68,7 +60,13 @@ class ImpressionsAndSuggestionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Impressions & Suggestions')),
+      appBar: AppBar(
+        title: const Text('Impressions & Suggestions'),
+        // warna app bar
+        backgroundColor: Colors.white,
+      ),
+      // warna background
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -159,6 +157,9 @@ class ImpressionsAndSuggestionsScreen extends StatelessWidget {
                 title: 'Impression',
                 content:
                     'Mata kuliah Teknologi Pemrograman Mobile sangat membantu dalam memahami dasar-dasar pengembangan aplikasi mobile. Materi yang disampaikan mudah dipahami dan aplikatif.',
+                cardColor: Colors.grey.shade200,
+                titleColor: Colors.grey.shade700,
+                contentColor: Colors.black87,
               ),
               impressionOrSuggestionCard(
                 icon: Icons.lightbulb_outline,
@@ -166,6 +167,9 @@ class ImpressionsAndSuggestionsScreen extends StatelessWidget {
                 title: 'Suggestion',
                 content:
                     'Semoga materi selanjutnya dapat lebih banyak membahas framework Flutter dan praktik langsung membuat aplikasi. Selain itu, harap ada lebih banyak studi kasus yang relevan dengan kebutuhan industri saat ini.',
+                cardColor: Colors.grey.shade200,
+                titleColor: Colors.grey.shade700,
+                contentColor: Colors.black87,
               ),
             ],
           ),

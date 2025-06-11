@@ -34,13 +34,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
   // Fungsi fetch data tempat dari API backend
   Future<List<Place>> fetchPlaces() async {
-    // final response = await http.get(
-    //   Uri.parse(
-    //     'https://boole-boolebe-525057870643.us-central1.run.app/places',
-    //   ),
-    // );
     final response = await http.get(
-      Uri.parse('http://192.168.1.14:5000/places'),
+      Uri.parse(
+        'https://boole-boolebe-525057870643.us-central1.run.app/places',
+      ),
     );
     if (response.statusCode == 200) {
       // Jika berhasil, decode JSON dan map ke list Place
@@ -103,18 +100,29 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       decoration: BoxDecoration(
                         // Warna latar kategori
-                        color: isSelected ? Colors.cyan : Colors.transparent,
+                        color:
+                            isSelected
+                                ? Colors.cyan
+                                : Colors.transparent, // warna latar kategori
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
                           color:
-                              isSelected ? Colors.cyan : Colors.grey.shade400,
+                              isSelected
+                                  ? Colors.cyan
+                                  : Colors
+                                      .grey
+                                      .shade400, // warna border kategori
                         ),
                       ),
                       child: Text(
+                        // teks kategori
                         cat['label']!,
                         style: TextStyle(
                           color:
-                              isSelected ? Colors.white : Colors.grey.shade700,
+                              isSelected
+                                  ? Colors
+                                      .white // warna teks kategori terpilih
+                                  : Colors.grey.shade700, // warna teks kategori
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -149,10 +157,11 @@ class _SearchScreenState extends State<SearchScreen> {
       margin: const EdgeInsets.only(right: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: Colors.white,
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-        ],
+        border: Border.all(
+          color: Colors.grey.shade300, // warna border kartu
+          width: 1.5, // ketebalan border
+        ),
+        color: Colors.white, // warna card
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
@@ -191,7 +200,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white70,
+                        color: Colors.white70, // warna latar rating
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -226,7 +235,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 16, // + color (text)
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -327,6 +336,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
         return Scaffold(
           appBar: AppBar(
+            // warna app bar
             backgroundColor: Colors.white,
             title: const Text('Find Your Destination'),
             titleTextStyle: const TextStyle(
@@ -337,7 +347,7 @@ class _SearchScreenState extends State<SearchScreen> {
             elevation: 0,
           ),
           // Tampilan body
-          backgroundColor: const Color(0xFFF8F4F7),
+          backgroundColor: const Color(0xFFF8F4F7), // warna body latar belakang
           body: Padding(
             padding: const EdgeInsets.only(top: 12),
             child: Column(
@@ -349,7 +359,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     height: 42,
                     // Tampilan pencarian
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: Colors.grey.shade300, // warna search bar
                       borderRadius: BorderRadius.circular(24),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -357,8 +367,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       controller: _searchController,
                       onChanged: (value) => setState(() {}),
                       decoration: InputDecoration(
-                        icon: const Icon(Icons.search),
-                        hintText: 'What are you looking for?',
+                        icon: const Icon(Icons.search), // + color
+                        hintText: 'What are you looking for?', // + hinstyle
                         border: InputBorder.none,
                       ),
                     ),
@@ -419,7 +429,10 @@ class _SearchScreenState extends State<SearchScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Text(
             title,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ), // + color (text)
           ),
         ),
 

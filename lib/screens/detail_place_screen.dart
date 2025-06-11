@@ -6,7 +6,6 @@ import '../models/place.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:another_flushbar/flushbar.dart';
 
 class DetailPlaceScreen extends StatefulWidget {
   final Place place;
@@ -128,20 +127,6 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
 
     await prefs.setStringList(key, favList);
     await showLocalNotification(place.name, isAdd);
-
-    // Flushbar(
-    //   message:
-    //       isAdd
-    //           ? 'Place successfully added to wishlist'
-    //           : 'Place successfully removed from wishlist',
-    //   icon: Icon(Icons.favorite, color: isAdd ? Colors.red : Colors.grey),
-    //   duration: const Duration(seconds: 3),
-    //   flushbarPosition: FlushbarPosition.TOP,
-    //   margin: const EdgeInsets.all(8),
-    //   borderRadius: BorderRadius.circular(10),
-    //   backgroundColor: Colors.cyan,
-    //   animationDuration: const Duration(milliseconds: 500),
-    // ).show(context);
   }
 
   //notif
@@ -329,7 +314,10 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
       selectedCurrency == 'IDR'
           ? 'IDR ${convertedPrice.toStringAsFixed(0)}'
           : '$selectedCurrency ${convertedPrice.toStringAsFixed(2)}',
-      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ), // + color untuk price
     );
   }
 
@@ -345,7 +333,6 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
@@ -375,34 +362,35 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                             const Icon(Icons.broken_image, size: 240),
                   ),
                 ),
+                // Positioned(
+                //   // Overlay gradient hitam transparan di atas gambar
+                //   top: 0,
+                //   left: 0,
+                //   right: 0,
+                //   height: 90,
+                //   child: Container(
+                //     // Overlay gradient hitam transparan di atas gambar
+                //     decoration: BoxDecoration(
+                //       borderRadius: const BorderRadius.vertical(
+                //         bottom: Radius.circular(30),
+                //       ),
+                //       gradient: LinearGradient(
+                //         colors: [
+                //           Colors.black.withOpacity(0.6),
+                //           Colors.transparent,
+                //         ],
+                //         begin: Alignment.topCenter,
+                //         end: Alignment.bottomCenter,
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 90,
-                  child: Container(
-                    // Overlay gradient hitam transparan di atas gambar
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(
-                        bottom: Radius.circular(30),
-                      ),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.black.withOpacity(0.6),
-                          Colors.transparent,
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
+                  // Overlay judul, kategori, rating di atas gambar
                   top: 230,
                   left: 20,
                   right: 20,
                   child: Row(
-                    // Judul, kategori, rating (overlay di gambar)
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
@@ -410,6 +398,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
+                              // Judul tempat
                               place.name,
                               style: const TextStyle(
                                 color: Colors.white,
@@ -426,6 +415,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                             ),
                             const SizedBox(height: 2),
                             Row(
+                              // Kategori tempat
                               children: [
                                 const Icon(
                                   Icons.location_on,
@@ -439,7 +429,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                                         place.category.substring(1),
                                     style: const TextStyle(
                                       color: Colors.white70,
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       shadows: [
                                         Shadow(
                                           color: Colors.black45,
@@ -462,7 +452,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black45,
+                          color: Colors.black38, // warna latar belakang rating
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -474,18 +464,12 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                             ),
                             const SizedBox(width: 4),
                             Text(
+                              // angka rating
                               place.rating.toStringAsFixed(1),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black45,
-                                    offset: Offset(1, 1),
-                                    blurRadius: 2,
-                                  ),
-                                ],
                               ),
                             ),
                           ],
@@ -513,7 +497,9 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.cyan),
+                        border: Border.all(
+                          color: Colors.cyan,
+                        ), // border Opening Hours
                       ),
                       child: Column(
                         children: [
@@ -526,13 +512,19 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                             displayedTime,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 16, // + color harga
                             ),
                           ),
                           const SizedBox(height: 8),
                           DropdownButton<String>(
                             value: selectedTimezone,
                             isExpanded: true,
+                            // dropdownColor: Colors.amber,
+                            // // fontcolor: Colors.black,
+                            // style: const TextStyle(
+                            //   color: Color.fromARGB(255, 255, 0, 0),
+                            //   fontSize: 16,
+                            // ),
                             underline: Container(height: 1, color: Colors.cyan),
                             items:
                                 timezoneOptions
@@ -579,6 +571,11 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                           DropdownButton<String>(
                             value: selectedCurrency,
                             isExpanded: true,
+                            // dropdownColor: Colors.white,
+                            // style: const TextStyle(
+                            //   color: Colors.black,
+                            //   fontSize: 16,
+                            // ),
                             underline: Container(height: 1, color: Colors.cyan),
                             items:
                                 currencyOptions
@@ -631,12 +628,12 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Colors.black,
+                        color: Colors.black, // warna header deskripsi
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.translate),
+                    icon: const Icon(Icons.translate, color: Colors.cyan),
                     tooltip:
                         isTranslated
                             ? 'Show Original Description'
@@ -656,7 +653,10 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                       ? const Center(child: CircularProgressIndicator())
                       : Text(
                         displayedDescription,
-                        style: const TextStyle(fontSize: 16, height: 1.5),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          height: 1.5,
+                        ), // + color isi deskripsi
                         textAlign: TextAlign.justify,
                       ),
             ),
@@ -710,7 +710,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                     );
                   }
                 },
-                icon: const Icon(Icons.map),
+                icon: const Icon(Icons.map), // + color icon
                 label: const Text('Open in Google Map'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.cyan,
@@ -734,7 +734,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
               child: IconButton(
                 icon: Icon(
                   place.isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: Colors.cyan,
+                  color: const Color.fromARGB(255, 255, 0, 0),
                 ),
                 onPressed: _toggleFavorite,
               ),

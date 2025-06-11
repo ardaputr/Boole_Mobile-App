@@ -107,11 +107,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _uploadImage(int userId) async {
     if (_imageFile == null) return;
 
-    // final url = Uri.parse(
-    //   'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId/upload-photo',
-    // );
+    final url = Uri.parse(
+      'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId/upload-photo',
+    );
 
-    final url = Uri.parse('http://192.168.1.14:5000/user/$userId/upload-photo');
     var request = http.MultipartRequest('POST', url);
     request.files.add(
       await http.MultipartFile.fromPath('photo', _imageFile!.path),
@@ -122,7 +121,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       // Jika berhasil, buat timestamp untuk menghindari cache
       setState(() {
         _uploadedImageUrl =
-            'http://192.168.1.14:5000${widget.userData['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
+            'https://boole-boolebe-525057870643.us-central1.run.app${widget.userData['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
         _imageFile =
             null; // reset file lokal, supaya pakai network image terbaru
       });
@@ -159,10 +158,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final int userId = widget.userData['id'];
-      final url = Uri.parse('http://192.168.1.14:5000/user/$userId');
-
-      // final url = Uri.parse('http://192.168.1.14:5000/user/$userId');
-
+      final url = Uri.parse(
+        'https://boole-boolebe-525057870643.us-central1.run.app/user/$userId',
+      );
       // Data yang dikirim ke server
       Map<String, dynamic> body = {
         'full_name': _fullNameController.text.trim(),
@@ -213,20 +211,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     TextInputType? keyboardType,
     bool obscureText = false,
     Widget? suffixIcon,
+    Color? labelColor,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 14,
-            color: Colors.black87,
+            fontSize: 16,
+            // warna label
+            // color: Colors.black87,
+            color: labelColor ?? Colors.black87,
           ),
         ),
         const SizedBox(height: 6),
         TextField(
+          // warna teks input
+          style: const TextStyle(fontSize: 16, color: Colors.black87),
           controller: controller,
           readOnly: readOnly,
           onTap: onTap,
@@ -248,7 +251,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      appBar: AppBar(
+        title: const Text('Edit Profile'),
+        backgroundColor: Colors.white,
+      ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Column(
@@ -266,7 +273,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ? NetworkImage(_uploadedImageUrl!)
                                 : (widget.userData['photo_url'] != null
                                     ? NetworkImage(
-                                      'http://192.168.1.14:5000${widget.userData['photo_url']}',
+                                      'https://boole-boolebe-525057870643.us-central1.run.app${widget.userData['photo_url']}',
                                     )
                                     : null))
                             as ImageProvider<Object>?,
@@ -277,6 +284,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _buildTextField(
               label: 'Full Name',
               controller: _fullNameController,
+              // labelColor: Colors.green,
             ),
             const SizedBox(height: 20),
             // Input field Email
@@ -366,6 +374,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: ElevatedButton(
                   onPressed: _saveProfile,
                   style: ElevatedButton.styleFrom(
+                    // warna button
                     backgroundColor: Colors.cyan,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),

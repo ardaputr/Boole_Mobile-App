@@ -63,10 +63,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      // String url =
-      //     "https://boole-boolebe-525057870643.us-central1.run.app/register";
-
-      String url = "http://192.168.1.14:5000/register";
+      String url =
+          "https://boole-boolebe-525057870643.us-central1.run.app/register";
 
       var res = await http.post(
         Uri.parse(url),
@@ -87,14 +85,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (response["success"] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration Successful")),
-        );
-
-        // Navigasi ke LoginScreen dengan flag untuk notifikasi
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder:
-                (context) => const LoginScreen(showWelcomeNotification: true),
-          ),
         );
       } else if (response["message"] == "Email Already Exists") {
         setState(() {

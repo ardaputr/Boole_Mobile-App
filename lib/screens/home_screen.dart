@@ -49,7 +49,8 @@ class _HomeScreenState extends State<HomeScreen> {
         //border biru app bar
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
         child: Container(
-          color: Colors.cyan, // background warna cyan
+          color: Colors.cyan, // warna app bar
+          // padding dalam app bar
           padding: const EdgeInsets.fromLTRB(
             20, // kiri
             53, // atas
@@ -68,12 +69,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
-                        color: Colors.white,
+                        color: Colors.white, // warna teks nama
                       ),
                     ),
                     const Text(
                       'Discovering Nearby Places',
-                      style: TextStyle(fontSize: 14, color: Colors.white70),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white70,
+                      ), // font size dan warna teks
                     ),
                   ],
                 ),
@@ -82,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _getGreetingMessage(),
                 style: const TextStyle(
                   fontSize: 18,
-                  color: Colors.white,
+                  color: Colors.white, // warna teks greeting
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.italic,
                 ),
@@ -114,27 +118,29 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: getAppBar(),
       body: _pages[_currentIndex],
       bottomNavigationBar: Container(
-        // buttom nav belakang
+        // navigation belakang decoration
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.3),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
           ),
           boxShadow: [
-            BoxShadow(color: Colors.cyan.withOpacity(0.5), blurRadius: 20),
+            BoxShadow(
+              color: Colors.cyan.withOpacity(0.5),
+              blurRadius: 20,
+            ), // bayangan di nav
           ],
         ),
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
-            // border buttom nav depan
+            // border nav depan
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
           ),
           child: BottomNavigationBar(
             currentIndex: _currentIndex,
-            selectedItemColor: Colors.cyan,
-            unselectedItemColor: Colors.grey,
+            selectedItemColor: Colors.cyan, //warna item yang dipilih
+            unselectedItemColor: Colors.grey, //warna item yang tidak dipilih
             onTap: (index) {
               setState(() {
                 _currentIndex = index;
@@ -158,6 +164,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 label: 'Profile',
               ),
             ],
+            // selectedIconTheme: IconThemeData(
+            //   color: Colors.blue, // Ganti warna ikon yang dipilih
+            // ),
+            // unselectedIconTheme: IconThemeData(
+            //   color: Colors.orange, // Ganti warna ikon yang tidak dipilih
+            // ),
           ),
         ),
       ),

@@ -72,7 +72,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
       final GoogleMapController controller = await _controller.future;
       controller.animateCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(target: _currentPosition!, zoom: 15), // camera lokasi
+          CameraPosition(
+            target: _currentPosition!,
+            zoom: 15,
+          ), // zoom camera lokasi
         ),
       );
     } catch (e) {
@@ -82,13 +85,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   // Mengambil daftar tempat dari API backend
   Future<List<Place>> fetchPlaces() async {
-    // final response = await http.get(
-    //   Uri.parse(
-    //     'https://boole-boolebe-525057870643.us-central1.run.app/places',
-    //   ),
-    // );
     final response = await http.get(
-      Uri.parse('http://192.168.1.14:5000/places'),
+      Uri.parse(
+        'https://boole-boolebe-525057870643.us-central1.run.app/places',
+      ),
     );
 
     if (response.statusCode == 200) {
@@ -110,8 +110,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
           end.latitude,
           end.longitude,
         ) /
-        // Convert meter ke kilometer dengan pembagi 300
-        300;
+        // Convert meter ke kilometer dengan pembagi 1000
+        1000;
   }
 
   // Membuat marker Google Maps untuk tiap tempat yang ada koordinatnya
@@ -124,17 +124,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
             case 'beach':
               icon = BitmapDescriptor.defaultMarkerWithHue(
                 BitmapDescriptor.hueAzure,
-              ); // biru muda
+              ); // warna marker biru muda
               break;
             case 'culinary':
               icon = BitmapDescriptor.defaultMarkerWithHue(
                 BitmapDescriptor.hueOrange,
-              ); // oranye
+              ); // warna marker oranye
               break;
             case 'nature':
               icon = BitmapDescriptor.defaultMarkerWithHue(
                 BitmapDescriptor.hueGreen,
-              ); // hijau
+              ); // warna marker hijau
               break;
             default:
               icon = BitmapDescriptor.defaultMarker; // merah default
@@ -218,7 +218,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   _currentPosition!,
                   placeLocation,
                 );
-                return distance <= 10; // atur jarak max 10 km
+                return distance <= 3; // atur jarak
               }).toList();
         } else {
           recommendedPlaces = _filteredPlaces;
@@ -262,7 +262,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 right: 60,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withOpacity(0.8), // warna search bar
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: const [
                       BoxShadow(
@@ -274,7 +274,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   ),
                   child: TextField(
                     decoration: const InputDecoration(
-                      hintText: 'Search places...',
+                      hintText: 'Search places...', // + hint style
                       prefixIcon: Icon(Icons.search),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(
@@ -297,6 +297,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 builder: (context, scrollController) {
                   return Container(
                     decoration: const BoxDecoration(
+                      // warna background sheet
                       color: Colors.white,
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(30),
@@ -325,6 +326,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                   height: 5,
                                   width: 50,
                                   decoration: BoxDecoration(
+                                    // warna garis kecil di atas
                                     color: Colors.grey[300],
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -365,14 +367,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                       ),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(24),
+                                        border: Border.all(
+                                          // warna boder card
+                                          color: Colors.grey[300]!,
+                                          width: 1.5,
+                                        ),
+                                        // warna card
                                         color: Colors.white,
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Colors.black12,
-                                            blurRadius: 6,
-                                            offset: Offset(0, 2),
-                                          ),
-                                        ],
                                       ),
                                       child: ClipRRect(
                                         // border kartu

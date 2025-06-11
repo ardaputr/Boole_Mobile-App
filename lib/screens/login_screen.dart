@@ -2,15 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:another_flushbar/flushbar.dart'; // Import Flushbar
 
 import 'home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  final bool showWelcomeNotification;
-
-  const LoginScreen({super.key, this.showWelcomeNotification = false});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -23,38 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _error;
   bool _passwordVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (widget.showWelcomeNotification) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showWelcomeNotification();
-      });
-    }
-  }
-
-  void _showWelcomeNotification() {
-    Flushbar(
-      message: "Let's go to explore",
-      icon: const Icon(Icons.chat_bubble, size: 28.0, color: Colors.white),
-      duration: const Duration(seconds: 3),
-      flushbarPosition: FlushbarPosition.TOP,
-      margin: const EdgeInsets.all(8),
-      borderRadius: BorderRadius.circular(10),
-      backgroundColor: Colors.cyan,
-      animationDuration: const Duration(milliseconds: 500),
-      mainButton: TextButton(
-        onPressed: () {
-          Navigator.of(
-            context,
-          ).pop(); // Tutup notifikasi saat tombol OK ditekan
-        },
-        child: const Text('OK', style: TextStyle(color: Colors.white)),
-      ),
-    ).show(context);
-  }
 
   Future<void> _saveSession(int id, String email, String fullName) async {
     final prefs = await SharedPreferences.getInstance();
@@ -69,8 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _error = null;
     });
 
-    // final url = "https://boole-boolebe-525057870643.us-central1.run.app/login";
-    final url = "http://192.168.1.14:5000/login";
+    final url = "https://boole-boolebe-525057870643.us-central1.run.app/login";
 
     try {
       final response = await http.post(

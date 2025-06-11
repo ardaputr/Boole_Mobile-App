@@ -32,7 +32,9 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.1.14:5000/user/${widget.userId}');
+      final url = Uri.parse(
+        'https://boole-boolebe-525057870643.us-central1.run.app/user/${widget.userId}',
+      );
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -44,7 +46,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
             // Set updated photo url dengan timestamp supaya reload gambar
             if (_userData?['photo_url'] != null) {
               _updatedPhotoUrl =
-                  'http://192.168.1.14:5000${_userData!['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
+                  'https://boole-boolebe-525057870643.us-central1.run.app${_userData!['photo_url']}?t=${DateTime.now().millisecondsSinceEpoch}';
             } else {
               _updatedPhotoUrl = null;
             }
@@ -92,7 +94,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
                       ? NetworkImage(_updatedPhotoUrl!)
                       : (_userData?['photo_url'] != null
                           ? NetworkImage(
-                            'http://192.168.1.14:5000${_userData!['photo_url']}',
+                            'https://boole-boolebe-525057870643.us-central1.run.app${_userData!['photo_url']}',
                           )
                           : NetworkImage(
                             'https://ui-avatars.com/api/?name=${Uri.encodeComponent(_userData!['full_name'])}&background=0D8ABC&color=fff',
@@ -104,7 +106,11 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
           Center(
             child: Text(
               _userData!['full_name'] ?? '',
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -162,11 +168,13 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
               text: '$label\n',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
+                // warna teks label
                 color: Colors.black87,
               ),
             ),
             TextSpan(
               text: value,
+              // warna teks value
               style: const TextStyle(color: Colors.black54),
             ),
           ],
@@ -192,8 +200,12 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile Detail')),
+      appBar: AppBar(
+        title: const Text('Profile Detail'),
+        backgroundColor: Colors.white, // warna app bar
+      ),
       body: _buildContent(),
+      backgroundColor: Colors.white, // warna latar belakang
     );
   }
 }
