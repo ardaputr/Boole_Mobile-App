@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
-                        color: Colors.white, // warna teks nama
+                        color: Colors.white, // warna teks nama app bar
                       ),
                     ),
                     const Text(
@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _getGreetingMessage(),
                 style: const TextStyle(
                   fontSize: 18,
-                  color: Colors.white, // warna teks greeting
+                  color: Colors.white, // warna teks greeting app bar
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.italic,
                 ),
@@ -139,8 +139,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           child: BottomNavigationBar(
             currentIndex: _currentIndex,
-            selectedItemColor: Colors.cyan, //warna item yang dipilih
-            unselectedItemColor: Colors.grey, //warna item yang tidak dipilih
+            selectedItemColor: Colors.cyan, //warna icon nav all yang dipilih
+            unselectedItemColor:
+                Colors.grey, //warna icon nav yang tidak dipilih
             onTap: (index) {
               setState(() {
                 _currentIndex = index;

@@ -101,17 +101,13 @@ class _SearchScreenState extends State<SearchScreen> {
                       decoration: BoxDecoration(
                         // Warna latar kategori
                         color:
-                            isSelected
-                                ? Colors.cyan
-                                : Colors.transparent, // warna latar kategori
+                            // warna latar kategori
+                            isSelected ? Colors.cyan : Colors.transparent,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
                           color:
-                              isSelected
-                                  ? Colors.cyan
-                                  : Colors
-                                      .grey
-                                      .shade400, // warna border kategori
+                              // warna border kategori
+                              isSelected ? Colors.cyan : Colors.grey.shade400,
                         ),
                       ),
                       child: Text(
@@ -119,10 +115,9 @@ class _SearchScreenState extends State<SearchScreen> {
                         cat['label']!,
                         style: TextStyle(
                           color:
-                              isSelected
-                                  ? Colors
-                                      .white // warna teks kategori terpilih
-                                  : Colors.grey.shade700, // warna teks kategori
+                              // warna teks kategori terpilih
+                              // warna teks kategori tidak terpilih
+                              isSelected ? Colors.white : Colors.grey.shade700,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -158,7 +153,7 @@ class _SearchScreenState extends State<SearchScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.grey.shade300, // warna border kartu
+          color: Colors.grey.shade300, // warna border card
           width: 1.5, // ketebalan border
         ),
         color: Colors.white, // warna card
